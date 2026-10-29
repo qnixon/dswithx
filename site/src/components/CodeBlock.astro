@@ -1,0 +1,71 @@
+---
+import { Code } from 'astro:components';
+import { githubUrl } from '../site';
+
+interface Props {
+  code: string;
+  filename: string;
+  repoPath: string;
+  lang?: string;
+}
+
+const { code, filename, repoPath, lang = 'plaintext' } = Astro.props;
+---
+
+<figure class="code-block">
+  <figcaption>
+    <span class="filename">{filename}</span>
+    <span class="actions">
+      <button type="button" class="copy" hidden>Copy</button>
+      <a href={githubUrl(repoPath)}>View on GitHub</a>
+    </span>
+  </figcaption>
+  <Code code={code} lang={lang as any} themes={{ light: 'github-light', dark: 'github-dark' }} defaultColor={false} />
+</figure>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>('.code-block .copy')) {
+    if (!navigator.clipboard) continue;
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      const code = button.closest('.code-block')?.querySelector('pre')?.textContent ?? '';
+      try {
+        await navigator.clipboard.writeText(code);
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Copy failed';
+      }
+      setTimeout(() => (button.textContent = 'Copy'), 1500);
+    });
+  }
+</script>
+
+<style>
+  .code-block {
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  figcaption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .filename { font-family: var(--font-mono); }
+  .actions { display: flex; gap: 0.9rem; align-items: center; }
+  .copy {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  .copy:hover { text-decoration: underline; }
+</style>

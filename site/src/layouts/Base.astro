@@ -1,0 +1,140 @@
+---
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+import { SITE_NAME, REPO_URL } from '../site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  wide?: boolean;
+}
+
+const { title, description = 'Data science from scratch, in many languages.', wide = false } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/concepts/', label: 'Concepts' },
+  { href: '/languages/', label: 'Languages' },
+  { href: '/rules/', label: 'Rules' },
+  { href: '/about/', label: 'About' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/JuliaMono-RegularLatin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Apply a saved theme before first paint to avoid a flash. -->
+    <script is:inline>
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme) document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container wide header-inner">
+        <a class="wordmark" href="/">DS with <span>X</span></a>
+        <nav aria-label="Main">
+          {nav.map((item) => (
+            <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))}
+          <button class="theme-toggle" type="button" aria-label="Toggle dark theme" hidden>
+            <span aria-hidden="true">◐</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class:list={['container', { wide }]}>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container wide">
+        <p>
+          Code <a href={`${REPO_URL}/blob/main/LICENSE`}>MIT</a> · Prose{' '}
+          <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> ·{' '}
+          <a href={REPO_URL}>Source on GitHub</a>
+        </p>
+        <p>Every example on this site is the exact file the test harness ran.</p>
+      </div>
+    </footer>
+
+    <script>
+      const button = document.querySelector<HTMLButtonElement>('.theme-toggle');
+      if (button) {
+        button.hidden = false;
+        const root = document.documentElement;
+        const isDark = () =>
+          root.dataset.theme
+            ? root.dataset.theme === 'dark'
+            : matchMedia('(prefers-color-scheme: dark)').matches;
+        const sync = () => button.setAttribute('aria-pressed', String(isDark()));
+        sync();
+        button.addEventListener('click', () => {
+          const next = isDark() ? 'light' : 'dark';
+          root.dataset.theme = next;
+          try {
+            localStorage.setItem('theme', next);
+          } catch {}
+          sync();
+        });
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-top: 0.9rem;
+    padding-bottom: 0.9rem;
+  }
+  .wordmark {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .wordmark span { color: var(--accent); }
+  nav { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 1.1rem; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  nav a:hover, nav a[aria-current='page'] { color: var(--text); }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0.3rem 0.45rem;
+    cursor: pointer;
+  }
+  main { padding-bottom: 4rem; }
+  .site-footer {
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.875rem;
+    padding: 1.5rem 0 2rem;
+  }
+  .site-footer p { margin: 0.25rem 0; }
+  .site-footer a { color: var(--muted); }
+</style>

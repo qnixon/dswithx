@@ -1,0 +1,59 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { getConcepts, getImplementations, getLanguages } from '../../../lib/repo';
+import { REPO_URL } from '../../../site';
+
+export async function getStaticPaths() {
+  const languages = await getLanguages();
+  return languages.map((language) => ({ params: { lang: language.id }, props: { language } }));
+}
+
+const { language } = Astro.props;
+const { Content } = await render(language);
+const [concepts, impls] = await Promise.all([getConcepts(), getImplementations()]);
+const mine = impls.filter((i) => i.language.id === language.id);
+const title = (id: string) => concepts.find((c) => c.id === id)?.data.title ?? id;
+---
+
+<Base title={language.data.name}>
+  <p class="muted kicker">Language</p>
+  <h1>{language.data.name}</h1>
+  <dl class="facts">
+    <div><dt>First appeared</dt><dd>{language.data.first_appeared}</dd></div>
+    <div><dt>Paradigm</dt><dd>{language.data.paradigm}</dd></div>
+    <div><dt>Toolchain</dt><dd>{language.data.toolchain}</dd></div>
+    <div><dt>Container image</dt><dd><code>{language.data.image}</code></dd></div>
+  </dl>
+
+  <div class="prose"><Content /></div>
+
+  <h2>Concepts in {language.data.name}</h2>
+  <ul>
+    {mine.map((i) => (
+      <li>
+        <a href={`/concepts/${i.concept}/#${i.slug}`}>{title(i.concept)}</a>
+        {i.meta.variant === 'built-in' && <span class="muted"> (built-in)</span>}
+      </li>
+    ))}
+  </ul>
+
+  <h2>Run the examples locally</h2>
+  <p>You need Docker and Python 3. The harness builds the pinned container and runs every {language.data.name} example:</p>
+  <pre class="shell"><code>{`git clone ${REPO_URL}.git
+cd dswithx
+python3 harness/run_tests.py --language ${language.id}`}</code></pre>
+</Base>
+
+<style>
+  .kicker { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; margin: 0 0 0.5rem; }
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 0.75rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .facts dt { color: var(--muted); font-size: 0.8rem; }
+  .facts dd { margin: 0; }
+  .shell { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+</style>

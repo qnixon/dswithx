@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Rules" description="What every implementation on DS with X may and may not use.">
+  <h1>Rules</h1>
+  <p class="lede">
+    Every implementation may use its language and that language's standard library, and nothing else.
+  </p>
+
+  <h2>No third-party packages</h2>
+  <p>
+    Python may use <code>csv</code>, <code>math</code>, and <code>statistics</code>, but not NumPy, pandas, or
+    scikit-learn. Ruby may use its standard library, but no gems. The containers that run the tests contain
+    only the language's own toolchain and have no network access, so nothing else can sneak in.
+  </p>
+
+  <h2>Built-in features are allowed, and labeled</h2>
+  <p>
+    Some tools ship data science features of their own, such as PostgreSQL's <code>regr_slope</code>, R's{' '}
+    <code>lm()</code>, or BigQuery ML. A page may show the built-in version beside a from-scratch one, and
+    each is labeled <span class="badge">From scratch</span> or <span class="badge">Built-in</span>.
+  </p>
+
+  <h2>One shared dataset per concept</h2>
+  <p>
+    Every implementation of a concept reads the same <code>data.csv</code> and must print the same results,
+    to within a relative tolerance of 10⁻⁴ (or an absolute tolerance of 10⁻⁶, whichever is looser).
+  </p>
+
+  <h2>Every implementation is verified</h2>
+  <p>
+    Each one is either run by the test harness on every change, marked{' '}
+    <span class="badge pass">Tested automatically</span>, or, for tools that cannot run in a container, such
+    as cloud services, checked by hand and marked <span class="badge warn">Manually verified</span> with the
+    date. The code you see is the exact file that was run.
+  </p>
+
+  <h2>Clarity over cleverness</h2>
+  <p>
+    Code is written to teach: idiomatic for its language, commented where the language is unfamiliar, and
+    short enough to read on one page where possible.
+  </p>
+</Base>

@@ -1,0 +1,70 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import ImplTabs from '../../../components/ImplTabs.astro';
+import { getConcepts, getImplementations, parseCsv, parseResults, readRepoFile } from '../../../lib/repo';
+
+export async function getStaticPaths() {
+  const concepts = await getConcepts();
+  return concepts.map((concept) => ({ params: { concept: concept.id }, props: { concept } }));
+}
+
+const { concept } = Astro.props;
+const text = await getEntry('conceptText', concept.id);
+const { Content } = text ? await render(text) : { Content: null };
+const impls = await getImplementations(concept.id);
+
+const data = parseCsv(readRepoFile(`concepts/${concept.id}/data.csv`));
+const PREVIEW_ROWS = 8;
+const expected = parseResults(readRepoFile(`concepts/${concept.id}/expected.txt`));
+---
+
+<Base title={concept.data.title} description={concept.data.summary}>
+  <article>
+    <p class="muted kicker">Concept · {concept.data.difficulty}</p>
+    <h1>{concept.data.title}</h1>
+    <p class="lede">{concept.data.summary}</p>
+
+    {Content && <div class="prose"><Content /></div>}
+
+    <h2>Data preview</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>{data.header.map((h) => <th class={h === concept.data.column ? 'num' : ''}>{h}</th>)}</tr>
+        </thead>
+        <tbody>
+          {data.rows.slice(0, PREVIEW_ROWS).map((row) => (
+            <tr>{row.map((cell, i) => <td class={data.header[i] === concept.data.column ? 'num' : ''}>{cell}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">
+      First {PREVIEW_ROWS} of {data.rows.length} rows ·{' '}
+      <a href="data.csv" download>Download data.csv</a>
+    </p>
+
+    <h2>Expected results</h2>
+    <p class="muted small">Every implementation must print these, to within a relative tolerance of 10⁻⁴.</p>
+    <div class="table-scroll">
+      <table class="results">
+        <tbody>
+          {expected.map(({ name, value }) => (
+            <tr><td><code>{name}</code></td><td class="num">{value}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Implementations</h2>
+    <ImplTabs impls={impls} />
+  </article>
+</Base>
+
+<style>
+  .kicker { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; margin: 0 0 0.5rem; }
+  .small { font-size: 0.875rem; }
+  table { max-width: 28rem; }
+  .results td:first-child code { background: none; border: 0; padding: 0; }
+</style>

@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+import { getConcepts, getImplementations, getLanguages } from '../lib/repo';
+
+const [concepts, languages, impls] = await Promise.all([getConcepts(), getLanguages(), getImplementations()]);
+const cell = (concept: string, language: string) =>
+  impls.filter((i) => i.concept === concept && i.language.id === language);
+---
+
+<Base wide>
+  <section class="hero">
+    <h1>Data science, from scratch, in every language we can get our hands on.</h1>
+    <p class="lede">
+      Each concept is explained once, then implemented in Python and R, but also in Ruby, awk, SQL, COBOL,
+      Fortran, APL, and Forth. Only what ships with the language is allowed. No NumPy, no pandas, no
+      packages.
+    </p>
+    <p class="lede">
+      Every example runs. The code on each page is the exact file our test harness executed and checked.
+    </p>
+    <p><a class="cta" href="/concepts/">Browse concepts →</a></p>
+  </section>
+
+  <section>
+    <h2>Coverage</h2>
+    <p class="muted">Concepts down the side, languages across the top. Each mark links to that implementation.</p>
+    <div class="table-scroll">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th scope="col"><span class="visually-hidden">Concept</span></th>
+            {languages.map((l) => <th scope="col"><a href={`/languages/${l.id}/`}>{l.data.name}</a></th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {concepts.map((c) => (
+            <tr>
+              <th scope="row"><a href={`/concepts/${c.id}/`}>{c.data.title}</a></th>
+              {languages.map((l) => (
+                <td>
+                  {cell(c.id, l.id).map((i) => (
+                    <a
+                      class="mark"
+                      href={`/concepts/${c.id}/#${i.slug}`}
+                      aria-label={`${c.data.title} in ${l.data.name}${i.meta.variant === 'built-in' ? ' (built-in)' : ''}`}
+                    >
+                      {i.meta.variant === 'built-in' ? '◆' : '●'}
+                    </a>
+                  ))}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted legend">● from scratch · ◆ built-in</p>
+  </section>
+</Base>
+
+<style>
+  .hero { max-width: var(--measure); }
+  .hero h1 { font-size: clamp(2rem, 6vw, 3rem); }
+  .cta { font-weight: 600; text-decoration: none; }
+  .grid { width: auto; min-width: 100%; }
+  .grid th, .grid td { text-align: center; white-space: nowrap; }
+  .grid th[scope='row'] { text-align: left; }
+  .grid thead a, .grid th[scope='row'] a { color: var(--text); text-decoration: none; }
+  .grid thead a:hover, .grid th[scope='row'] a:hover { color: var(--accent); }
+  .mark { text-decoration: none; font-size: 1.1rem; padding: 0 0.15rem; }
+  .legend { font-size: 0.85rem; }
+</style>

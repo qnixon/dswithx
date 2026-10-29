@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getImplementations, getLanguages } from '../../lib/repo';
+
+const [languages, impls] = await Promise.all([getLanguages(), getImplementations()]);
+const count = (id: string) => impls.filter((i) => i.language.id === id).length;
+---
+
+<Base title="Languages">
+  <h1>Languages</h1>
+  <p class="lede">Every language and tool on the site, with the exact toolchain the tests run.</p>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Language</th><th class="num">First appeared</th><th>Paradigm</th><th class="num">Concepts</th></tr>
+      </thead>
+      <tbody>
+        {languages.map((l) => (
+          <tr>
+            <td><a href={`/languages/${l.id}/`}>{l.data.name}</a></td>
+            <td class="num">{l.data.first_appeared}</td>
+            <td>{l.data.paradigm}</td>
+            <td class="num">{count(l.id)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</Base>

@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getConcepts, getImplementations } from '../../lib/repo';
+
+const [concepts, impls] = await Promise.all([getConcepts(), getImplementations()]);
+const count = (id: string) => impls.filter((i) => i.concept === id).length;
+---
+
+<Base title="Concepts">
+  <h1>Concepts</h1>
+  <p class="lede">In teaching order. Each builds on the ones before it.</p>
+  <ol class="concepts">
+    {concepts.map((c) => (
+      <li>
+        <a href={`/concepts/${c.id}/`}>{c.data.title}</a>
+        <span class="muted"> · {count(c.id)} implementations · {c.data.difficulty}</span>
+        <p>{c.data.summary}</p>
+      </li>
+    ))}
+  </ol>
+</Base>
+
+<style>
+  .concepts { padding-left: 1.25rem; }
+  .concepts li { margin-bottom: 1.25rem; }
+  .concepts a { font-weight: 600; font-size: 1.1rem; }
+  .concepts span { font-size: 0.875rem; }
+  .concepts p { margin: 0.15rem 0 0; }
+</style>

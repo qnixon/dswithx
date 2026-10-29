@@ -1,0 +1,158 @@
+/* JuliaMono covers APL and other unusual glyphs. The full font is ~1 MB, so
+   the small Latin subset is declared last (and so preferred) for the ranges it
+   covers; browsers fetch the full file only for pages with other characters. */
+@font-face {
+  font-family: 'JuliaMono';
+  src: url('/fonts/JuliaMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JuliaMono';
+  src: url('/fonts/JuliaMono-RegularLatin.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0000-007F, U+00A0-00FF;
+}
+
+:root {
+  --bg: #fbfaf7;
+  --surface: #f2f0ea;
+  --text: #1c1d1f;
+  --muted: #5d6166;
+  --border: #e2ded5;
+  --accent: #0b6b66;
+  --accent-soft: #dff0ee;
+  --pass: #1f7a3f;
+  --pass-soft: #e2f3e7;
+  --warn: #8a5a00;
+  --warn-soft: #fbefd5;
+
+  --font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JuliaMono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --measure: 46rem;
+  --wide: 64rem;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #121416;
+    --surface: #1b1e21;
+    --text: #e5e4e0;
+    --muted: #9ba0a6;
+    --border: #2c3034;
+    --accent: #5cc6bd;
+    --accent-soft: #163330;
+    --pass: #6fd08f;
+    --pass-soft: #17301f;
+    --warn: #f0c062;
+    --warn-soft: #33290f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #121416;
+  --surface: #1b1e21;
+  --text: #e5e4e0;
+  --muted: #9ba0a6;
+  --border: #2c3034;
+  --accent: #5cc6bd;
+  --accent-soft: #163330;
+  --pass: #6fd08f;
+  --pass-soft: #17301f;
+  --warn: #f0c062;
+  --warn-soft: #33290f;
+  color-scheme: dark;
+}
+
+/* Shiki emits both themes as CSS variables (defaultColor: false); pick one. */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+  }
+}
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+a { color: var(--accent); text-underline-offset: 0.15em; }
+a:hover { text-decoration-thickness: 2px; }
+
+h1, h2, h3 { line-height: 1.25; letter-spacing: -0.01em; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); margin: 0 0 0.5rem; }
+h2 { font-size: 1.45rem; margin: 2.5rem 0 0.75rem; }
+h3 { font-size: 1.15rem; margin: 1.75rem 0 0.5rem; }
+
+code, pre, kbd { font-family: var(--font-mono); font-size: 0.9em; }
+:not(pre) > code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+}
+pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  line-height: 1.5;
+  font-size: 0.875rem;
+  tab-size: 4;
+}
+
+.container { max-width: var(--measure); margin: 0 auto; padding: 0 16px; }
+.container.wide { max-width: var(--wide); }
+
+.lede { font-size: 1.2rem; color: var(--muted); margin-top: 0; }
+.muted { color: var(--muted); }
+
+/* Tables */
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+th, td { text-align: left; padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; color: var(--muted); font-size: 0.85rem; }
+td.num, th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  white-space: nowrap;
+}
+.badge.pass { background: var(--pass-soft); color: var(--pass); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+
+/* KaTeX display math can be wider than a phone. */
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 0.25rem 0; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}

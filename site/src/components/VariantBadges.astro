@@ -1,0 +1,15 @@
+---
+import type { Implementation } from '../lib/repo';
+
+interface Props {
+  meta: Implementation['meta'];
+}
+
+const { meta } = Astro.props;
+const verifiedOn = meta.verified_on?.toISOString().slice(0, 10);
+---
+
+<span class="badge">{meta.variant === 'built-in' ? 'Built-in' : 'From scratch'}</span>
+{meta.verification === 'automated'
+  ? <span class="badge pass" title="Run and checked by the test harness on every change">Tested automatically</span>
+  : <span class="badge warn" title="Cannot run in CI; checked by hand">Manually verified {verifiedOn}</span>}

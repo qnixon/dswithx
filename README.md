@@ -32,7 +32,7 @@ concepts/<concept>/          one folder per concept
     main.<ext>, notes.md, meta.yaml
 languages/<lang>/            Dockerfile, run.sh, language.md
 harness/                     test runner
-site/                        Astro website (not yet built)
+site/                        Astro website
 ```
 
 ## The run contract
@@ -70,7 +70,20 @@ the harness parses them with the Python standard library.
 
 ## Run the site
 
-To come in step 4.
+The site is an [Astro](https://astro.build) project in `site/`. It reads
+`concepts/` and `languages/` directly at build time; no code is copied into it.
+Use Node.js 26 LTS (see `.nvmrc`).
+
+```sh
+cd site
+npm ci              # install the pinned dependencies
+npm run dev         # live preview at http://localhost:4321
+npm run build       # static site in site/dist/
+npm run preview     # serve the built site
+```
+
+Math in `concept.mdx` (`$...$` and `$$...$$`) is rendered with KaTeX at build
+time. MDX does not accept HTML comments; use `{/* ... */}` instead.
 
 ## License
 

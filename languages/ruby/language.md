@@ -4,6 +4,7 @@ first_appeared: 1995
 paradigm: Object-oriented, with functional features
 toolchain: CRuby 4.0.9
 image: ruby:4.0.9-slim-trixie
+highlight: ruby
 ---
 
 <!-- Placeholder text: to be written. -->

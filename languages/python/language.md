@@ -4,6 +4,7 @@ first_appeared: 1991
 paradigm: Multi-paradigm (imperative, object-oriented, functional)
 toolchain: CPython 3.15.2
 image: python:3.15.2-slim-trixie
+highlight: python
 ---
 
 <!-- Placeholder text: to be written. -->

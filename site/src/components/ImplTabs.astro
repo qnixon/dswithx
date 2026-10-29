@@ -1,0 +1,137 @@
+---
+import { render } from 'astro:content';
+import CodeBlock from './CodeBlock.astro';
+import VariantBadges from './VariantBadges.astro';
+import type { Implementation } from '../lib/repo';
+
+interface Props {
+  impls: Implementation[];
+}
+
+const { impls } = Astro.props;
+const panels = await Promise.all(
+  impls.map(async (impl) => ({
+    impl,
+    label: impl.language.data.name + (impl.meta.variant === 'built-in' ? ' (built-in)' : ''),
+    Notes: impl.notes ? (await render(impl.notes)).Content : null,
+  })),
+);
+---
+
+<div class="impl-tabs">
+  <!-- Shown by the script below; without JavaScript every panel is listed in turn. -->
+  <div class="tablist" role="tablist" aria-label="Implementations" hidden>
+    {panels.map(({ impl, label }) => (
+      <button type="button" role="tab" id={`tab-${impl.slug}`} aria-controls={impl.slug} data-slug={impl.slug}>
+        {label}
+      </button>
+    ))}
+  </div>
+
+  {panels.map(({ impl, label, Notes }) => (
+    <section class="panel" id={impl.slug} role="tabpanel" aria-labelledby={`tab-${impl.slug}`}>
+      <div class="panel-head">
+        <h3>{label}</h3>
+        <VariantBadges meta={impl.meta} />
+        <a class="lang-link" href={`/languages/${impl.language.id}/`}>{impl.language.data.toolchain}</a>
+      </div>
+      <CodeBlock
+        code={impl.file.code}
+        filename={impl.file.name}
+        repoPath={impl.file.path}
+        lang={impl.language.data.highlight}
+      />
+      {Notes && (
+        <div class="notes">
+          <Notes />
+        </div>
+      )}
+    </section>
+  ))}
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('.impl-tabs')) {
+    const tablist = root.querySelector<HTMLElement>('[role=tablist]')!;
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[role=tabpanel]')];
+
+    const select = (slug: string, focus = false) => {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.slug === slug;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        if (active && focus) tab.focus();
+      });
+      panels.forEach((panel) => (panel.hidden = panel.id !== slug));
+    };
+    const fromHash = () => {
+      const slug = decodeURIComponent(location.hash.slice(1));
+      return panels.some((p) => p.id === slug) ? slug : null;
+    };
+
+    tablist.hidden = false;
+    root.classList.add('enhanced');
+    select(fromHash() ?? panels[0].id);
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => {
+        select(tab.dataset.slug!);
+        // Update the shareable #<lang> link without jumping the page.
+        history.replaceState(null, '', `#${tab.dataset.slug}`);
+      });
+      tab.addEventListener('keydown', (event) => {
+        const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+        if (!step) return;
+        const next = tabs[(i + step + tabs.length) % tabs.length];
+        next.click();
+        next.focus();
+      });
+    });
+    window.addEventListener('hashchange', () => {
+      const slug = fromHash();
+      if (slug) select(slug);
+    });
+  }
+</script>
+
+<style>
+  .tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+  [role='tab'] {
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 0.5rem 0.85rem;
+    cursor: pointer;
+  }
+  [role='tab']:hover { color: var(--text); }
+  [role='tab'][aria-selected='true'] {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .panel + .panel { margin-top: 2.5rem; }
+  .enhanced .panel + .panel { margin-top: 0; }
+  .panel { scroll-margin-top: 1rem; }
+  .panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .panel-head h3 { margin: 0 0.25rem 0 0; }
+  .enhanced .panel-head h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .lang-link { margin-left: auto; font-size: 0.85rem; }
+  .notes { margin-top: 1rem; }
+</style>
