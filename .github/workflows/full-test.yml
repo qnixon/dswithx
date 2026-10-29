@@ -1,0 +1,33 @@
+# Test every implementation weekly and on demand. Catches drift that no commit
+# caused, such as a base image rebuilt under the same pinned tag.
+name: Full test
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      languages: ${{ steps.plan.outputs.languages }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: plan
+        run: echo "languages=$(python3 harness/ci_plan.py --all)" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: plan
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(needs.plan.outputs.languages) }}
+    name: test (${{ matrix.language }})
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: python3 harness/run_tests.py --language ${{ matrix.language }}

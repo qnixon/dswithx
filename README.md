@@ -85,6 +85,22 @@ npm run preview     # serve the built site
 Math in `concept.mdx` (`$...$` and `$$...$$`) is rendered with KaTeX at build
 time. MDX does not accept HTML comments; use `{/* ... */}` instead.
 
+## CI and deployment
+
+GitHub Actions runs two workflows:
+
+- **CI** (`.github/workflows/ci.yml`), on every push and pull request. Tests
+  the languages a change affects (`harness/ci_plan.py` decides), one matrix job
+  per language, and builds the site. On `main` it tests every language and,
+  only if all pass, deploys `site/dist` to Cloudflare with `wrangler deploy`.
+- **Full test** (`.github/workflows/full-test.yml`), weekly and on demand.
+  Tests everything, to catch drift no commit caused.
+
+The site is served by Cloudflare Workers Static Assets with no Worker script
+(`site/wrangler.jsonc`). Deploying needs two repository secrets, set under
+Settings → Secrets and variables → Actions: `CLOUDFLARE_API_TOKEN` (a token
+with Workers edit permission) and `CLOUDFLARE_ACCOUNT_ID`.
+
 ## License
 
 Code is MIT ([LICENSE](LICENSE)). Prose (`*.md`, `*.mdx`) is CC BY 4.0
