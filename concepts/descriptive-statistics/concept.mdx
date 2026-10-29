@@ -1,0 +1,25 @@
+<!-- Placeholder text: to be written. -->
+
+Descriptive statistics summarize a list of numbers with a few values that
+describe its size, its center, and its spread.
+
+## The dataset
+
+`data.csv` holds 120 synthetic one-way commute times, in minutes, one per day.
+It was generated once by `make_data.py` (log-normal, fixed seed 20261029) and
+committed. Implementations read the `minutes` column by its header name.
+
+## The math
+
+For values $x_1, \dots, x_n$:
+
+$$
+\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
+\qquad
+s^2 = \frac{1}{n - 1} \sum_{i=1}^{n} (x_i - \bar{x})^2
+\qquad
+s = \sqrt{s^2}
+$$
+
+The median is the middle value after sorting, or the mean of the two middle
+values when $n$ is even. The range is $\max - \min$.

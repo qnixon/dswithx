@@ -1,0 +1,9 @@
+count 120
+sum 3561.300000
+mean 29.677500
+median 28.750000
+min 11.500000
+max 61.300000
+range 49.800000
+variance 83.623943
+std_dev 9.144613
