@@ -5,20 +5,26 @@ import { getConcepts, getImplementations, getLanguages } from '../lib/repo';
 const [concepts, languages, impls] = await Promise.all([getConcepts(), getLanguages(), getImplementations()]);
 const cell = (concept: string, language: string) =>
   impls.filter((i) => i.concept === concept && i.language.id === language);
+const languageList = new Intl.ListFormat('en', { type: 'conjunction' }).format(languages.map((l) => l.data.name));
+const hasBuiltIn = impls.some((i) => i.meta.variant === 'built-in');
 ---
 
 <Base wide>
   <section class="hero">
     <h1>Data science, from scratch, in every language we can get our hands on.</h1>
     <p class="lede">
-      Each concept is explained once, then implemented in Python and R, but also in Ruby, awk, SQL, COBOL,
-      Fortran, APL, and Forth. Only what ships with the language is allowed. No NumPy, no pandas, no
-      packages.
+      Each concept is explained once, then implemented in {languageList}, using only what
+      ships with each language. No NumPy, no pandas, no packages. More languages are on the way.
     </p>
     <p class="lede">
-      Every example runs. The code on each page is the exact file our test harness executed and checked.
+      Every example runs. The code on each page is the exact file our test harness ran, and its output had
+      to match the same expected answer in every language.
     </p>
-    <p><a class="cta" href="/concepts/">Browse concepts →</a></p>
+    <p class="lede">
+      Start with a concept to see one idea written several ways side by side, or start with a language to
+      see how it handles each idea.
+    </p>
+    <p class="ctas"><a class="cta" href="/concepts/">Browse concepts →</a> <a class="cta" href="/languages/">Browse languages →</a></p>
   </section>
 
   <section>
@@ -54,13 +60,14 @@ const cell = (concept: string, language: string) =>
         </tbody>
       </table>
     </div>
-    <p class="muted legend">● from scratch · ◆ built-in</p>
+    <p class="muted legend">● from scratch{hasBuiltIn && ' · ◆ built-in'}</p>
   </section>
 </Base>
 
 <style>
   .hero { max-width: var(--measure); }
   .hero h1 { font-size: clamp(2rem, 6vw, 3rem); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
   .cta { font-weight: 600; text-decoration: none; }
   .grid { width: auto; min-width: 100%; }
   .grid th, .grid td { text-align: center; white-space: nowrap; }
