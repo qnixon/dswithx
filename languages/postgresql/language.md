@@ -17,7 +17,8 @@ database.
 ## Quirks
 
 - The harness loads `data.csv` into a table named `data`; numeric columns
-  become `double precision`.
+  become `double precision`. Tables have no row order, so an extra `row_id`
+  column numbers the rows in file order, from 1.
 - The final query returns two columns, `name` and `value`, one row per result.
 - Built-in aggregates such as `avg()`, `stddev_samp()`, and
   `percentile_cont()` are avoided in from-scratch versions.
