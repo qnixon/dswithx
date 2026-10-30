@@ -1,11 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getConcepts, getImplementations, getLanguages } from '../lib/repo';
+import { HOME_HIGHLIGHTS, HOME_LIST_LIMIT } from '../site';
 
 const [concepts, languages, impls] = await Promise.all([getConcepts(), getLanguages(), getImplementations()]);
 const cell = (concept: string, language: string) =>
   impls.filter((i) => i.concept === concept && i.language.id === language);
-const languageList = new Intl.ListFormat('en', { type: 'conjunction' }).format(languages.map((l) => l.data.name));
+const listFormat = new Intl.ListFormat('en', { type: 'conjunction' });
+const names = (ls: typeof languages) => listFormat.format(ls.map((l) => l.data.name));
+const highlights = HOME_HIGHLIGHTS.flatMap((id) => languages.filter((l) => l.id === id));
+const languageList =
+  languages.length <= HOME_LIST_LIMIT
+    ? names(languages)
+    : `${languages.length} languages` + (highlights.length ? `, including ${names(highlights)}` : '');
 const hasBuiltIn = impls.some((i) => i.meta.variant === 'built-in');
 ---
 
@@ -14,7 +21,7 @@ const hasBuiltIn = impls.some((i) => i.meta.variant === 'built-in');
     <h1>Data science, from scratch, in every language we can get our hands on.</h1>
     <p class="lede">
       Each concept is explained once, then implemented in {languageList}, using only what
-      ships with each language. No NumPy, no pandas, no packages. More languages are on the way.
+      ships with each language. No NumPy, no pandas, no packages.
     </p>
     <p class="lede">
       Every example runs. The code on each page is the exact file our test harness ran, and its output had
@@ -35,7 +42,11 @@ const hasBuiltIn = impls.some((i) => i.meta.variant === 'built-in');
         <thead>
           <tr>
             <th scope="col"><span class="visually-hidden">Concept</span></th>
-            {languages.map((l) => <th scope="col"><a href={`/languages/${l.id}/`}>{l.data.name}</a></th>)}
+            {languages.map((l) => (
+              <th scope="col" class="lang">
+                <a href={`/languages/${l.id}/`}>{l.data.name}</a>
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -69,11 +80,20 @@ const hasBuiltIn = impls.some((i) => i.meta.variant === 'built-in');
   .hero h1 { font-size: clamp(2rem, 6vw, 3rem); }
   .ctas { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
   .cta { font-weight: 600; text-decoration: none; }
-  .grid { width: auto; min-width: 100%; }
+  .grid { width: auto; }
   .grid th, .grid td { text-align: center; white-space: nowrap; }
-  .grid th[scope='row'] { text-align: left; }
+  .grid td, .grid th.lang { padding: 0.35rem 0.4rem; min-width: 1.6rem; }
   .grid thead a, .grid th[scope='row'] a { color: var(--text); text-decoration: none; }
   .grid thead a:hover, .grid th[scope='row'] a:hover { color: var(--accent); }
-  .mark { text-decoration: none; font-size: 1.1rem; padding: 0 0.15rem; }
+  /* Language names run bottom to top so each column is only as wide as a mark. */
+  .grid th.lang { vertical-align: bottom; }
+  .grid th.lang a { display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); }
+  /* Concept names stay in view while the languages scroll past. */
+  .grid th[scope='row'], .grid thead th:first-child {
+    position: sticky; left: 0; z-index: 1;
+    text-align: left; white-space: normal; background: var(--bg);
+    box-shadow: inset -1px 0 var(--border); /* a border would scroll away with the table */
+  }
+  .mark { text-decoration: none; font-size: 1.1rem; }
   .legend { font-size: 0.85rem; }
 </style>
