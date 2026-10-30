@@ -7,5 +7,8 @@
     "directory": "./dist",
     // Serve dist/404.html, with a 404 status, for unknown paths.
     "not_found_handling": "404-page"
-  }
+  },
+  // Serve the site at the apex domain; Cloudflare creates the DNS record and
+  // certificate. www.dswithx.com redirects here via a dashboard Redirect Rule.
+  "routes": [{ "pattern": "dswithx.com", "custom_domain": true }]
 }
