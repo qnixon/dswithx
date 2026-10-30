@@ -6,3 +6,6 @@ site/dist/
 site/.astro/
 .wrangler/
 .env
+
+# Planning notes, kept private
+DS with X — Build Spec for Claude Code.md
