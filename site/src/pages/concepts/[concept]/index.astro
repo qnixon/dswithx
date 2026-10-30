@@ -16,6 +16,8 @@ const impls = await getImplementations(concept.id);
 
 const data = parseCsv(readRepoFile(`concepts/${concept.id}/data.csv`));
 const PREVIEW_ROWS = 8;
+// Right-align columns whose values are all numbers.
+const numeric = data.header.map((_, i) => data.rows.every((row) => row[i] !== '' && !isNaN(Number(row[i]))));
 const expected = parseResults(readRepoFile(`concepts/${concept.id}/expected.txt`));
 ---
 
@@ -31,11 +33,11 @@ const expected = parseResults(readRepoFile(`concepts/${concept.id}/expected.txt`
     <div class="table-scroll">
       <table>
         <thead>
-          <tr>{data.header.map((h) => <th class={h === concept.data.column ? 'num' : ''}>{h}</th>)}</tr>
+          <tr>{data.header.map((h, i) => <th class={numeric[i] ? 'num' : ''}>{h}</th>)}</tr>
         </thead>
         <tbody>
           {data.rows.slice(0, PREVIEW_ROWS).map((row) => (
-            <tr>{row.map((cell, i) => <td class={data.header[i] === concept.data.column ? 'num' : ''}>{cell}</td>)}</tr>
+            <tr>{row.map((cell, i) => <td class={numeric[i] ? 'num' : ''}>{cell}</td>)}</tr>
           ))}
         </tbody>
       </table>

@@ -1,0 +1,31 @@
+{/* Placeholder text: to be written. */}
+
+Linear regression finds the straight line $\hat{y} = a + bx$ that best fits a
+set of points, where "best" means the line that minimizes the sum of squared
+vertical distances from the points to the line (least squares).
+
+## The dataset
+
+`data.csv` holds 100 synthetic students: weekly study `hours` and exam
+`score`. It was generated once by `make_data.py` (a line with slope 5.2 and
+intercept 42, plus normal noise; fixed seed 20261030) and committed.
+
+## The math
+
+With means $\bar{x}$ and $\bar{y}$, define the sums of squares and
+cross-products
+
+$$
+S_{xx} = \sum (x_i - \bar{x})^2 \qquad
+S_{yy} = \sum (y_i - \bar{y})^2 \qquad
+S_{xy} = \sum (x_i - \bar{x})(y_i - \bar{y})
+$$
+
+Then the least-squares slope and intercept, and the correlation $r$, are
+
+$$
+b = \frac{S_{xy}}{S_{xx}} \qquad a = \bar{y} - b\,\bar{x} \qquad
+r = \frac{S_{xy}}{\sqrt{S_{xx}\,S_{yy}}}
+$$
+
+$r^2$ is the share of the variation in scores that the line explains.

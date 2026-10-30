@@ -1,0 +1,26 @@
+{/* Placeholder text: to be written. */}
+
+k-nearest neighbors (kNN) classifies a new point by looking at the $k$
+labelled points closest to it and taking a majority vote. There is no
+training step: the "model" is the training data itself.
+
+## The dataset
+
+`data.csv` holds 200 synthetic wheat seeds of two varieties, `kama` and
+`rosa`, with kernel `length_mm` and `width_mm`. The `split` column marks 150
+rows as `train` and 50 as `test`. It was generated once by `make_data.py`
+(fixed seed 20261031) and committed.
+
+## The method
+
+For each test seed, with $k = 5$:
+
+1. Compute the Euclidean distance to every training seed:
+   $d = \sqrt{(\ell_1 - \ell_2)^2 + (w_1 - w_2)^2}$.
+2. Take the 5 nearest training seeds.
+3. Predict the variety most of them have. With two varieties and an odd $k$,
+   the vote cannot tie.
+
+The result is the share of test seeds predicted correctly (accuracy). The
+generator made sure no test seed has a near-tie for 5th-nearest neighbor, so
+every implementation finds the same neighbors.

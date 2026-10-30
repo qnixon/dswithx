@@ -1,0 +1,4 @@
+train_count 150
+test_count 50
+correct 47
+accuracy 0.940000

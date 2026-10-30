@@ -1,0 +1,4 @@
+title: k-means clustering
+summary: Group points into k clusters around moving centroids.
+order: 4
+difficulty: intermediate

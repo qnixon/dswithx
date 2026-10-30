@@ -1,0 +1,4 @@
+title: k-nearest neighbors
+summary: Classify a point by the majority vote of its closest neighbors.
+order: 3
+difficulty: beginner

@@ -1,0 +1,32 @@
+{/* Placeholder text: to be written. */}
+
+k-means groups points into $k$ clusters. Each cluster has a centroid, and
+the algorithm alternates between assigning points to their nearest centroid
+and moving each centroid to the mean of its points, until nothing changes.
+
+## The dataset
+
+`data.csv` holds 150 synthetic points, `x` and `y`, drawn from three
+overlapping blobs. It was generated once by `make_data.py` (fixed seed
+20261101) and committed. The first three rows come from different blobs.
+
+## The method
+
+With $k = 3$:
+
+1. Start with the first three points as the centroids.
+2. **Assign** every point to its nearest centroid by Euclidean distance.
+3. If no point changed cluster since the last assignment, stop.
+4. **Update** each centroid to the mean of its assigned points, then go back
+   to step 2.
+
+`iterations` counts the assignment steps, including the final one where
+nothing changed. `inertia` is the sum of squared distances from each point to
+its centroid:
+
+$$
+\text{inertia} = \sum_{i} \lVert p_i - c_{a(i)} \rVert^2
+$$
+
+The generator made sure no point is ever (almost) equally close to two
+centroids, so every implementation follows the same path.

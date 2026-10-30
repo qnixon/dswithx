@@ -19,7 +19,8 @@ const concepts = defineCollection({
     summary: z.string(),
     order: z.number(),
     difficulty: z.string(),
-    column: z.string(),
+    // The data column a single-column concept reads, if there is one.
+    column: z.string().optional(),
   }),
 });
 

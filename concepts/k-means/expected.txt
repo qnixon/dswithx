@@ -1,0 +1,11 @@
+iterations 5
+centroid_1_x 1.700192
+centroid_1_y 2.138462
+centroid_2_x 6.204800
+centroid_2_y 3.043400
+centroid_3_x 3.130833
+centroid_3_y 5.749792
+size_1 52
+size_2 50
+size_3 48
+inertia 423.627610

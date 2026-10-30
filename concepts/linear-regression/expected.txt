@@ -1,0 +1,5 @@
+count 100
+slope 5.202961
+intercept 42.225716
+r 0.927659
+r_squared 0.860551
