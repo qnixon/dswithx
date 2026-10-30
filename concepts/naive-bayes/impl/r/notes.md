@@ -1,11 +1,13 @@
-<!-- Placeholder text: to be written. -->
+R reads like a description of the method. `table(train$label)` counts the
+labels and returns them with sorted names, and `which.max` picks the first
+maximum, so the tie rule comes for free. Comparing a column to a value gives
+a logical vector, and `sum()` counts the `TRUE`s, so
+`sum(in_label[[f]] == row[[f]])` is a whole count in one expression. That's
+why this version keeps no count table: it recounts the matching training
+rows each time it scores.
 
-**Easy:** counting is what R does best. `table()` gives the label counts with
-names already sorted alphabetically, so `which.max()` (first maximum) gives the
-tie rule for free, and `unique()` gives the number of distinct values per
-feature for the smoothing denominator. Base R has no naive Bayes classifier;
-`naiveBayes()` is in the `e1071` package, not in this image.
-
-**Hard:** `read.csv` guesses column types, so `colClasses = "character"` keeps
-the yes/no values as plain strings. A single data frame row is still a data
-frame, so `row[[f]]` is needed to pull out one value.
+Watch the indexing. With `f` holding a feature name, `row$f` looks for a column literally
+named `f` and returns `NULL`; `row[[f]]` uses the variable. And
+`colClasses = "character"` stops `read.csv` from guessing types: a column of
+`T` and `F` would come back logical. Base R has no naive Bayes classifier;
+`naiveBayes()` lives in the `e1071` package, which isn't installed here.

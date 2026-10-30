@@ -1,10 +1,10 @@
-<!-- Placeholder text: to be written. -->
+R was built for this, so the from-scratch version is the long way around.
+`lm(score ~ hours)` fits the line in one call, and `cor()` gives r. We
+avoided both, and `mean()` too, to show the arithmetic.
 
-**Easy:** the formulas map almost symbol for symbol. Vectorized arithmetic
-makes each sum one expression, such as `sum((x - mean_x) * (y - mean_y))`, and
-`read.csv` hands back the columns by name. As with descriptive statistics, the
-from-scratch version is the long way round in R: `lm(score ~ hours)` fits the
-line and `cor()` gives r in one call each.
-
-**Hard:** nothing about the arithmetic. The only care needed is to avoid
-`mean()`, `cor()`, and `lm()`, which are the idiomatic R answer.
+Vectorization keeps it short anyway. `x - mean_x` is a whole vector of
+deviations, so `sum((x - mean_x) * (y - mean_y))` is the cross-product sum with no loop,
+and `read.csv` hands back the columns by name as `data$hours` and
+`data$score`. Printing is short too: `sprintf` also works on vectors, so one
+call formats all four named results, and this is the shortest
+implementation on the page.

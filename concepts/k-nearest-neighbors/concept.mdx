@@ -1,15 +1,22 @@
-{/* Placeholder text: to be written. */}
-
-k-nearest neighbors (kNN) classifies a new point by looking at the $k$
-labelled points closest to it and taking a majority vote. There is no
-training step: the "model" is the training data itself.
+k-nearest neighbors (kNN) classifies a new point by finding the $k$
+labelled points closest to it and taking a majority vote. The assumption
+is that things that measure alike are probably the same kind. There is no
+training step: kNN keeps every training point and does its work when you ask
+about a new one. The data is the model.
 
 ## The dataset
 
-`data.csv` holds 200 synthetic wheat seeds of two varieties, `kama` and
-`rosa`, with kernel `length_mm` and `width_mm`. The `split` column marks 150
-rows as `train` and 50 as `test`. It was generated once by `make_data.py`
-(fixed seed 20261031) and committed.
+`data.csv` holds 200 synthetic wheat seeds, 100 each of two varieties, `kama`
+and `rosa`, with kernel `length_mm` and `width_mm`. We drew it once with
+`make_data.py` (fixed seed 20261031) from normal distributions: kama seeds
+centered at 5.5 mm by 3.2 mm, rosa at 6.2 mm by 3.6 mm. The varieties overlap
+a little, so some seeds are genuinely hard to call. The rows are shuffled,
+and the `split` column marks 150 as `train` and 50 as `test`.
+
+The generator rejects any draw where a test seed's 5th and 6th nearest
+training seeds are less than 10⁻⁶ mm apart in distance; it took 32 draws to
+pass. Otherwise, which seed got 5th place would depend on each language's
+tie-breaking or floating-point rounding, and the answers could differ.
 
 ## The method
 
@@ -21,6 +28,54 @@ For each test seed, with $k = 5$:
 3. Predict the variety most of them have. With two varieties and an odd $k$,
    the vote cannot tie.
 
-The result is the share of test seeds predicted correctly (accuracy). The
-generator made sure no test seed has a near-tie for 5th-nearest neighbor, so
-every implementation finds the same neighbors.
+Deep inside a cluster, every neighbor agrees: 40 of the 50 test seeds got a
+5–0 vote. Near the border, neighbors mix. Take the test seed at 5.96 mm by
+3.21 mm, a kama:
+
+| Neighbor (length × width) | Variety | Distance (mm) |
+| --- | --- | --- |
+| 5.99 × 3.18 | rosa | 0.042 |
+| 5.94 × 3.27 | kama | 0.063 |
+| 5.88 × 3.14 | kama | 0.106 |
+| 5.90 × 3.12 | kama | 0.108 |
+| 5.93 × 3.35 | rosa | 0.143 |
+
+Kama wins 3 to 2, correctly, even though the single nearest seed is a rosa.
+With $k = 1$ this seed would be misclassified. A larger $k$ outvotes one
+unlucky neighbor; too large a $k$ pulls in seeds from far away.
+
+## Reading the results
+
+47 of the 50 test seeds are classified correctly, an accuracy of 0.94. The
+three misses were all 3–2 votes in the overlap. A rosa at 5.84 × 3.32 is
+closer to the kama center than to its own, a kama at 6.06 × 3.21 is closer
+to the rosa center, and a kama at 5.87 × 3.36 is nearly equidistant (0.403
+mm versus 0.408 mm). Any method that sees only length and width would
+struggle with them.
+
+Distance adds up differences across features, so a feature measured in
+bigger numbers counts for more. Here both are millimetres with similar
+spreads: standard deviations of 0.46 mm for length and 0.27 mm for width. Record width in
+micrometres and length stops counting: accuracy drops to 45 of 50, the same
+as using width alone. The fix is feature scaling, such as rescaling each
+feature to a standard deviation of 1.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made kNN classifier. They use
+general tools: arithmetic, square roots, Python's `math.dist`, sorting, and
+counting helpers such as `Counter`, `tally`, `table()`, and SQL's `count`.
+awk and COBOL skip the square root and compare squared distances.
+
+Watch how each finds the 5 nearest. Python, Ruby, R, and PostgreSQL sort all
+150 distances for every test seed; awk and COBOL pick the nearest unused seed
+five times over.
+
+Watch tie-breaking too. On an exactly equal distance, all six keep the
+earlier training row: Python's `sorted` and R's `order()` are stable, while
+Ruby's `sort_by` isn't, so Ruby adds the file position to its sort key. But
+floating point decides what counts as equal. The test seed at 6.06 × 3.21
+has two training seeds exactly 0.13 mm away. COBOL's decimal arithmetic sees
+a tie; Python sees 0.1299999999999999 and 0.13000000000000037, so the two
+come out in opposite orders. Both are among the five either way, which is
+why the generator only guards the 5th/6th boundary.

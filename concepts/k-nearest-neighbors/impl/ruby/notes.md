@@ -1,10 +1,12 @@
-<!-- Placeholder text: to be written. -->
+Ruby reads cleanly here. `partition` splits training from test seeds in one
+call, `tally` turns the five neighbor labels into vote counts, and `max_by`
+picks the winner. Distance is a one-liner,
+`Math.sqrt(a.zip(b).sum { |x, y| (x - y)**2 })`, and it works for any number
+of features. For exactly two, `Math.hypot(dx, dy)` would also do.
 
-**Easy:** `partition` splits train from test in one call, `tally` counts the
-votes, and `max_by` picks the winner. A hash per row (`names.zip(values).to_h`)
-makes reading by header name painless.
-
-**Hard:** `sort_by` is not stable in Ruby, so neighbors at equal distance could
-come back in any order. Sorting by `[distance, file_position]` restores the
-file-order tie-break the concept asks for. There is no built-in Euclidean
-distance like Python's `math.dist`, but it is a one-liner.
+The catch is sorting. Ruby's `sort_by` is not stable: when we sorted 100
+pairs on a key with only two values, equal keys came back out of their
+original order. So `classify` sorts by `[distance, i]`, where `i` is the
+file position from `each_with_index`. Equal distances then keep file order,
+as in the other languages. Each line is split on commas by hand, which works
+because no field in this file is quoted.

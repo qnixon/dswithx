@@ -1,7 +1,11 @@
-<!-- Placeholder text: to be written. -->
+Python keeps the whole loop short. `math.dist` gives the Euclidean distance,
+and `min(range(K), key=...)` picks the nearest centroid; `min` returns the
+first of equal values, so a tie would go to the lower index. Points are
+plain tuples, and comparing two lists with `==` tells you when the
+assignments stopped changing.
 
-**Easy:** `min` with a `key` picks the nearest centroid, and comparing two
-lists with `==` tells when assignments stopped changing.
+The one trap is an empty cluster, which has no mean. Our data never
+produces one, but the code keeps the old centroid if it does.
 
-**Hard:** remembering that an empty cluster has no mean; this version keeps
-its old centroid.
+There was no built-in to skip this time: the standard library has no
+clustering at all, so in real code you'd reach for a third-party package.

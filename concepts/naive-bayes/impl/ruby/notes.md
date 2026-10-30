@@ -1,10 +1,12 @@
-<!-- Placeholder text: to be written. -->
+Ruby's hashes do the work. `tally` counts the labels in one call, and
+`Hash.new(0)` makes a counter whose missing keys read as zero. Arrays work as
+hash keys, so `value_counts[[f, row[f], row[LABEL]]] += 1` counts a feature,
+value, and label together. `max_by` keeps the first maximum, so sorting the
+labels first gives the tie rule.
 
-**Easy:** `Hash.new(0)` gives a counter whose missing keys read as zero, and
-arrays work as hash keys, so `[feature, value, label]` indexes the counts
-directly. `tally` counts labels and `fdiv` avoids integer division.
-
-**Hard:** integer division truncates, so every probability needs `fdiv` (or a
-`to_f`); forgetting one would silently give `0` and `Math.log(0)` of
-`-Infinity`. Methods cannot see local variables, so the scorer is a lambda
-closing over the counts.
+Two things push back. Integer division truncates: `3 / 55` is `0`, and
+`Math.log(0)` is `-Infinity`, with no error. Every probability uses `fdiv` to
+avoid that. And a method defined with `def` can't see the script's local
+variables, so the scorer is a lambda that closes over the counts. As on
+other pages, we split lines on commas by hand, because `csv` has been a
+bundled gem rather than part of the default standard library since Ruby 3.4.

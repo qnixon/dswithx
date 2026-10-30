@@ -1,11 +1,11 @@
-<!-- Placeholder text: to be written. -->
+SQL describes results instead of loops, and the fit is just a few sums
+over one table. Three common table expressions follow the formulas in
+order: `means`, then `sums` of squares and cross-products, then `fit`. The
+second pass over the data is a join to the one-row `means` result.
 
-**Easy:** the whole fit is a few sums over one table. Each common table
-expression (means, then sums of squares, then the fit) is one line of the
-formula, and the second pass over the data is just a join to the one-row
-`means` result.
-
-**Hard:** not much. The means have to be computed in their own step before
-the deviations can be summed, because an aggregate cannot use another
-aggregate over the same rows. (The built-ins `regr_slope`, `regr_intercept`,
-`corr`, and `regr_r2` do each result in one call.)
+The means need their own step because aggregates can't nest: `sum(hours -
+sum(hours) / count(*))` is an error. Printing also takes care, since
+`round(value, 6)` doesn't exist for `double precision`, so each result is
+cast to `numeric` first. PostgreSQL could do the whole job with
+`regr_slope`, `regr_intercept`, `corr`, and `regr_r2`, which match this
+query's results. We avoided them here.

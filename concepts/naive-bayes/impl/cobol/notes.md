@@ -1,11 +1,12 @@
-<!-- Placeholder text: to be written. -->
+COBOL has no dictionaries, only fixed tables indexed by position. Nested
+`OCCURS` clauses give a feature-by-value-by-label grid of counts,
+`WS-VALUE-ROWS(F, V, L)`, but finding the right `V` or `L` means a linear
+scan of the names seen so far, adding a new entry the first time one
+appears. Since the data is all text, there is no number parsing at all.
 
-**Easy:** counting. Nested `OCCURS` tables give a natural
-feature-by-value-by-label grid of counts, and categorical data needs no
-number parsing at all.
-
-**Hard:** there are no dictionaries, so every label and value is looked up by
-a linear scan and added to its table the first time it is seen. Each log
-score is built as a sum of `FUNCTION LOG` of whole counts (log a - log b
-rather than log(a / b)), so no quotient is truncated to the field's decimals
-before the log is taken.
+Each log score is built from logs of whole counts, `FUNCTION LOG(WS-MATCHES
++ 1) - FUNCTION LOG(...)`, rather than the log of a quotient. Storing 17/57 in
+a four-decimal field first would shift its log by about 0.00015.
+GnuCOBOL's inline `FUNCTION LOG(A / B)` gave the precise value when we tried
+it, but whole counts avoid the question. The program runs to 246 lines, about
+five times the Python.

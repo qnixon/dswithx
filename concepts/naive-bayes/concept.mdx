@@ -1,20 +1,23 @@
-{/* Placeholder text: to be written. */}
-
 Naive Bayes classifies by asking which label makes the observed features most
-probable. It is "naive" because it assumes the features are independent given
-the label, which lets each one be counted separately.
+probable. It is "naive" because it assumes the features are independent once
+you know the label. That's rarely true, but it lets each feature be
+counted on its own, so training is just counting. Early spam filters worked
+this way, and it's still a fast, sturdy baseline for categorical data.
 
 ## The dataset
 
 `data.csv` holds 200 synthetic emails labelled `spam` or `ham`, with three
 yes/no features: `has_link`, `mentions_money`, and `known_sender`. The `split`
-column marks 150 rows as `train` and 50 as `test`. It was generated once by
-`make_data.py` (fixed seed 20261102) and committed.
+column marks 150 rows as `train` and 50 as `test`. We generated it once with
+`make_data.py` (fixed seed 20261102) and committed the result. Each email is
+spam with probability 0.4. Spam then has a link 80% of the time, mentions
+money 70%, and comes from a known sender 10%; for ham, those are 30%, 10%,
+and 70%. The training rows hold 55 spam and 95 ham.
 
 ## The math
 
-From the training rows, count everything. For a test email with feature values
-$v_1, v_2, v_3$, the score of label $c$ is
+For a test email with feature values $v_1, v_2, v_3$, the score of label $c$
+is
 
 $$
 \log P(c) + \sum_{j} \log P(v_j \mid c)
@@ -26,9 +29,61 @@ $$
 
 $n_c$ is the number of training emails with label $c$, $n_{c,v_j}$ the number
 of those whose feature $j$ is $v_j$, and $m_j$ the number of distinct values
-feature $j$ takes (here 2). Adding 1 to every count (Laplace smoothing) keeps
-an unseen combination from zeroing out a label. Logs turn the product of
-probabilities into a sum.
+feature $j$ takes (here 2). In words: start with how common the label is, then
+for each feature, ask how often that label had this value. The higher score
+wins; an exact tie would go to the alphabetically first label.
 
-The predicted label is the one with the higher score; an exact tie would go
-to the alphabetically first label.
+## A worked example
+
+The first test email has a link, doesn't mention money, and comes from an
+unknown sender. It is spam. From the training counts:
+
+| | spam (55) | ham (95) |
+|---|---|---|
+| $P(c)$ | 55/150 = 0.3667 | 95/150 = 0.6333 |
+| has a link | (43+1)/57 = 0.7719 | (18+1)/97 = 0.1959 |
+| no money | (16+1)/57 = 0.2982 | (82+1)/97 = 0.8557 |
+| unknown sender | (52+1)/57 = 0.9298 | (29+1)/97 = 0.3093 |
+| score (sum of logs) | −2.5448 | −3.4164 |
+
+Spam wins, correctly. Ham starts ahead because it's more common, but a link
+is 3.9 times likelier under spam and an unknown sender 3.0 times, and that
+outweighs it.
+
+Why logs? Products of probabilities shrink fast. In Python, multiplying 400
+probabilities of 0.1 underflows to exactly `0.0`, while the sum of their logs,
+about −921, is fine. Log keeps order, so the higher score still wins.
+
+Why add one? A zero count would make a probability zero, and one zero wipes
+out the whole product. No count here is zero, but one is close: only 3 of 55
+training spam came from a known sender. Smoothing raises that probability
+from 0.0545 to 0.0702. That flips emails with all three features set from ham
+(−4.4734 against −4.5019 for spam) to spam (−4.2731 against −4.3927). Two of
+the three such test emails are spam, so smoothing gains one correct answer.
+
+## Reading the results
+
+The model gets 42 of 50 test emails right, an accuracy of 0.84; calling
+everything ham would score 0.68. Three yes/no features allow only eight kinds
+of email, and the model calls one spam if the sender is unknown and it has a
+link or mentions money, or if all three features are set.
+
+Six of the eight mistakes are ham called spam: five from unknown senders with
+a link or money, one with all three features set. The other two are spam that
+looked like ham. Training isn't to blame: the generator's true probabilities
+make the same call for all eight kinds. These features just can't tell those
+emails apart.
+
+## What to watch for across languages
+
+None of these implementations uses a naive Bayes library, and none of the six
+languages ships one. They use only general tools: counting (such as Python's
+`Counter` or SQL's `count(*)`), logarithms, and comparing label names.
+
+Watch how each keys its counts by feature, value, and label. Python and Ruby
+use a tuple or array as the key, awk joins the three into one string, and
+COBOL indexes a three-dimensional table by position. R stores no value counts;
+it recounts matching training rows each time it scores. PostgreSQL turns the
+three feature columns into rows first, so one `GROUP BY` counts them all the
+same way. And watch the tie rule: each language reaches "alphabetically
+first" in its own way.

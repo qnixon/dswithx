@@ -1,19 +1,32 @@
-{/* Placeholder text: to be written. */}
-
-Linear regression finds the straight line $\hat{y} = a + bx$ that best fits a
-set of points, where "best" means the line that minimizes the sum of squared
-vertical distances from the points to the line (least squares).
+Linear regression fits a straight line through a cloud of points, so you can
+describe how one quantity changes with another and predict one from the
+other. It is the simplest model that learns from data, and it is built
+from the pieces of descriptive statistics: means, squared deviations, and
+sums.
 
 ## The dataset
 
-`data.csv` holds 100 synthetic students: weekly study `hours` and exam
-`score`. It was generated once by `make_data.py` (a line with slope 5.2 and
-intercept 42, plus normal noise; fixed seed 20261030) and committed.
+`data.csv` holds 100 students' weekly study `hours` and exam `score`. The
+data is synthetic. `make_data.py` drew each student's hours uniformly
+between 0.5 and 10, then set the score to $42 + 5.2 \times \text{hours}$
+plus normal noise with a standard deviation of 6, using the fixed seed
+20261030. Scores were kept between 0 and 100, and 3 students hit the cap at
+exactly 100. We ran it once and committed the result.
 
-## The math
+Because we made the data, you can check how close least squares gets to
+the true line.
 
-With means $\bar{x}$ and $\bar{y}$, define the sums of squares and
-cross-products
+## The idea: least squares
+
+Any line $\hat{y} = a + bx$ makes a prediction for each student. The gap
+between a student's real score and the line's prediction is a **residual**.
+Least squares picks the intercept $a$ and slope $b$ that make the sum of
+the squared residuals as small as possible. As with variance, squaring
+stops misses above and below the line from canceling out, and it punishes
+big misses more than small ones.
+
+That minimization has a closed-form answer. With means $\bar{x}$ and
+$\bar{y}$, define the sums of squares and cross-products
 
 $$
 S_{xx} = \sum (x_i - \bar{x})^2 \qquad
@@ -28,4 +41,43 @@ b = \frac{S_{xy}}{S_{xx}} \qquad a = \bar{y} - b\,\bar{x} \qquad
 r = \frac{S_{xy}}{\sqrt{S_{xx}\,S_{yy}}}
 $$
 
-$r^2$ is the share of the variation in scores that the line explains.
+Here is the intuition. $S_{xy}$ asks whether students who study more than
+average also score more than average. Each term is positive when both
+deviations have the same sign and negative when they differ. In this data,
+93 of the 100 terms are positive, and $S_{xy}$ comes to 4720.63. Dividing by
+$S_{xx} = 907.30$, the spread in hours, turns that into points per hour:
+$b = 5.20$. The intercept then follows from one fact: the fitted line always
+passes through the point of means, here 5.027 hours and 68.381 points.
+
+The correlation $r$ uses the same $S_{xy}$, but scales it by the spread in
+both variables, so it has no units and always lies between −1 and 1.
+
+## Reading the results
+
+The fitted slope is 5.202961: each extra hour of study goes with about 5.2
+more points. The intercept is 42.225716, the predicted score for a student
+who studies zero hours. Read it with care, since nobody in the data studied
+less than half an hour. Both land very close to the 5.2 and 42 we used to
+generate the data.
+
+The correlation is $r = 0.927659$, a strong positive relationship. Its
+square, $r^2 = 0.860551$, is the share of the variation in scores that the
+line explains. The squared deviations of the scores from their mean add up
+to $S_{yy} = 28541.33$. The squared residuals around the line add up to
+only 3980.07, and $1 - 3980.07 / 28541.33$ is exactly $r^2$. The other 14%
+is the noise. The root-mean-square residual is 6.31 points, close to the
+standard deviation of 6 we put in.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made regression or correlation
+function, even where the language has one: no `lm()` or `cor()` in R, no
+`statistics.linear_regression` in Python, no `regr_slope` or `corr` in
+PostgreSQL. They don't call a built-in mean either. They do use everyday building blocks:
+arithmetic, a square root, and in most languages a built-in `sum`
+(PostgreSQL adds `count`).
+
+Watch for how each language makes the two passes the formulas need. The
+means come first, then the deviations from them. Watch how it pairs each
+`hours` value with its `score`. And watch how much code goes into reading
+two columns by name compared with the regression itself.

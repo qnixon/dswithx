@@ -1,12 +1,13 @@
-<!-- Placeholder text: to be written. -->
+Matrices fit k-means well. The points are a two-column matrix,
+`colSums(members) / nrow(members)` moves a centroid, and
+`centroids[assignment, ]` lines each point up with its own centroid, so the
+inertia is one `sum()`. `which.min()` returns the first minimum, which is the
+lower-index tie rule, and `identical()` checks whether anything changed.
 
-**Easy:** matrices fit the algorithm well. `colSums(members) / nrow(members)`
-moves a centroid, `centroids[assignment, ]` lines each point up with its own
-centroid so the inertia is one `sum()`, and `which.min()` returns the first
-minimum, which is exactly the lower-index tie rule. `kmeans()` is built in,
-but its default algorithm is Hartigan-Wong, not Lloyd's; the from-scratch
-loop needs `kmeans(points, points[1:3, ], algorithm = "Lloyd")` to compare.
+The trap is that subsetting a matrix down to one row silently turns it into
+a plain vector unless you pass `drop = FALSE`.
 
-**Hard:** 1-based cluster numbers are convenient for output but mean the
-"lower index" rule is about 1..3, not 0..2. Subsetting a matrix down to one row
-silently drops it to a vector unless `drop = FALSE` is passed.
+`kmeans()` is built in, but its default algorithm is Hartigan-Wong, not the
+loop on this page. `kmeans(points, centers = points[1:3, ], algorithm =
+"Lloyd")` reproduces our result exactly: 5 iterations, sizes 52, 50, and 48,
+and inertia 423.627610.

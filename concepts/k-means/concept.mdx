@@ -1,14 +1,21 @@
-{/* Placeholder text: to be written. */}
-
 k-means groups points into $k$ clusters. Each cluster has a centroid, and
 the algorithm alternates between assigning points to their nearest centroid
 and moving each centroid to the mean of its points, until nothing changes.
+Unlike k-nearest neighbors, it has no labeled examples to learn from. You
+hand it raw points and a number $k$, and it finds the groups on its own.
 
 ## The dataset
 
-`data.csv` holds 150 synthetic points, `x` and `y`, drawn from three
-overlapping blobs. It was generated once by `make_data.py` (fixed seed
-20261101) and committed. The first three rows come from different blobs.
+`data.csv` holds 150 synthetic points, `x` and `y`, generated once by
+`make_data.py` (fixed seed 20261101) and committed. It draws three round
+blobs of 50 points, centered at (2, 2), (6, 3), and (3.5, 6), with a
+standard deviation of 1.3. The centers are only 3.9 to 4.3 apart, so the
+blobs overlap.
+
+The first three rows come one from each blob, because k-means here starts
+from them. The generator also rejects any draw where a point is ever within
+$10^{-6}$ of being equally close to two centroids, since rounding could then
+send it different ways in different languages. The first draw passed.
 
 ## The method
 
@@ -28,5 +35,50 @@ $$
 \text{inertia} = \sum_{i} \lVert p_i - c_{a(i)} \rVert^2
 $$
 
-The generator made sure no point is ever (almost) equally close to two
-centroids, so every implementation follows the same path.
+Why does it stop? Both steps can only lower the inertia. Moving a point to
+its nearest centroid can't increase its squared distance, and the mean is
+the position with the smallest total squared distance to a group. There are
+finitely many ways to split the points, so the falling inertia must run out.
+
+On this data:
+
+- **Pass 1** assigns all 150 points: 45, 51, and 54 per cluster. The update
+  moves the centroids from (1.25, 1.66), (6.42, 3.18), and (2.41, 5.11) to
+  (1.555, 1.913), (6.203, 3.113), and (3.011, 5.454). Inertia falls from
+  467.03 to 431.41.
+- **Pass 2** moves 4 points, and no centroid then moves more than 0.16.
+- **Passes 3 and 4** each move 2 points from cluster 3 to cluster 1.
+  Cluster 2 no longer changes, so its centroid stays put.
+- **Pass 5** changes nothing, and the loop stops.
+
+The first step does most of the work. After that, only points near the
+borders switch sides, and the centroids drift by hundredths.
+
+## Reading the results
+
+The final centroids are (1.700, 2.138), (6.205, 3.043), and (3.131, 5.750),
+holding 52, 50, and 48 points, with an inertia of 423.63. Each lies 0.21 to
+0.45 from one of the true centers.
+
+Two things cause the gap. Each blob is only a sample of 50 points, so its
+own mean isn't exactly its center. And the blobs overlap: 15 of the 150
+points end up in a cluster other than the blob they came from. k-means
+can't know where a point came from. It only minimizes inertia, and by that
+measure it beats the truth: grouping points by their real blobs gives an
+inertia of 487.47.
+
+The answer also depends on the starting centroids, and the algorithm never
+chooses $k$ for you. We fixed both, so every language has one result to
+match.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made k-means, such as R's
+`kmeans()`. They use general tools: a distance formula (Python's
+`math.dist`, written out by hand elsewhere), sums, counts, and picking the
+smallest value. Watch how each holds 2-D points: tuples, nested arrays, a
+matrix, separate x and y arrays in awk and PostgreSQL, or a table of
+records in COBOL. Watch how each notices that nothing changed: four compare
+the whole assignment with the last one, while awk and COBOL set a flag as
+they go. And watch PostgreSQL, which has no loop and repeats the two steps
+with `WITH RECURSIVE`.
