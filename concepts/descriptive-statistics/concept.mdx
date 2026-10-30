@@ -1,17 +1,42 @@
-{/* Placeholder text: to be written. */}
-
-Descriptive statistics summarize a list of numbers with a few values that
-describe its size, its center, and its spread.
+Before you model data, you describe it. Descriptive statistics boil a column
+of numbers down to a handful of values that tell you how many there are,
+where they center, and how widely they spread. Every later concept on this
+site leans on these: regression is built from means and variances, and
+k-means moves centroids to means.
 
 ## The dataset
 
-`data.csv` holds 120 synthetic one-way commute times, in minutes, one per day.
-It was generated once by `make_data.py` (log-normal, fixed seed 20261029) and
-committed. Implementations read the `minutes` column by its header name.
+`data.csv` holds 120 days of one person's commute, in `minutes`. The data is
+synthetic: we drew it once from a log-normal distribution with a fixed seed
+(see `make_data.py`) and committed the result. Log-normal is a good fit for
+commutes. Most days land near a typical time, but traffic can't make a trip
+much shorter, only much longer, so a few bad days stretch out to the right.
+Here, 8 of the 120 days took longer than 45 minutes, and the worst took 61.3.
 
-## The math
+## Center: mean and median
 
-For values $x_1, \dots, x_n$:
+The **mean** is the sum divided by the count. The **median** is the middle
+value once the data is sorted, or the average of the two middle values when
+the count is even, as it is here.
+
+For these commutes, the mean is 29.68 minutes and the median is 28.75. The
+mean is higher because the long right tail pulls it up, while the median
+only cares about the order of the values. To see how differently they
+react, imagine the worst day had taken 200 minutes instead of 61.3. The mean
+would rise to 30.83, but the median wouldn't move at all. When a few
+extreme values matter less than the typical case, the median is usually the
+better summary.
+
+## Spread: range, variance, and standard deviation
+
+The **range**, maximum minus minimum, is the simplest measure of spread, but
+it depends on only the two most extreme days.
+
+The **variance** uses every value. It averages the squared distance of each
+value from the mean. Squaring keeps values above and below the mean from
+canceling out, and it weighs large deviations more than small ones. The
+**standard deviation** is the square root of the variance, which puts it
+back in the data's own units: minutes, not minutes squared.
 
 $$
 \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i
@@ -21,5 +46,24 @@ s^2 = \frac{1}{n - 1} \sum_{i=1}^{n} (x_i - \bar{x})^2
 s = \sqrt{s^2}
 $$
 
-The median is the middle value after sorting, or the mean of the two middle
-values when $n$ is even. The range is $\max - \min$.
+Why divide by $n - 1$ instead of $n$? These 120 days are a sample of all the
+days this commute could take. The deviations are measured from the sample's
+own mean, which by construction sits as close to these particular values as
+possible, so they come out slightly smaller than deviations from the true
+long-run mean would. Dividing by $n - 1$ (Bessel's correction) makes up for
+that. With 120 values the difference is under 1%, but with 5 it's 25%.
+
+Here the standard deviation is 9.14 minutes. A useful reading: a typical day
+lands within about 9 minutes of the average. In this data, 87 of the 120
+days (72%) fall within one standard deviation of the mean.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made mean, median, variance, or
+standard deviation function, even where the language has one. They do use
+everyday building blocks: arithmetic, a square root, sorting, and in most
+languages a built-in `sum`. PostgreSQL also uses SQL's basic `count`, `min`,
+and `max` aggregates; the other languages read the minimum and maximum
+straight off the sorted values. Watch for how each one sorts (needed for the
+median), how it avoids integer-division traps when averaging, and how much
+ceremony it takes to print a number to six decimal places.

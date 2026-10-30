@@ -1,10 +1,9 @@
-<!-- Placeholder text: to be written. -->
+R was built for exactly this, so the from-scratch version is the long way
+around. `mean()`, `median()`, `var()`, and `sd()` are all built in, and
+`var()` already divides by n − 1. We avoided them to show the arithmetic.
 
-**Easy:** everything. Arithmetic is vectorized, so the variance is
-`sum((values - mean_value)^2) / (n - 1)` with no loop, and `read.csv` returns
-columns by name. R is the one language here where the from-scratch version is
-the harder way: `mean()`, `median()`, `var()`, and `sd()` would each do a line
-in one call.
-
-**Hard:** 1-based indexing makes the median's middle positions easy to get off
-by one.
+Even so, vectorization keeps it short. `values - mean_value` subtracts the
+mean from every value at once, so the variance needs no loop, and one
+`sprintf` call formats all eight results together. The trap is indexing:
+R counts from 1, so the two middle values of 120 are `values[60]` and
+`values[61]`.

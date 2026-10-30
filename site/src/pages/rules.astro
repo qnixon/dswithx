@@ -15,6 +15,15 @@ import Base from '../layouts/Base.astro';
     only the language's own toolchain and have no network access, so nothing else can sneak in.
   </p>
 
+  <h2>What "from scratch" means</h2>
+  <p>
+    The steps that make up the method are written out in the code: averaging, variance, fitting a line,
+    finding neighbors, moving centroids, combining probabilities. General-purpose tools are allowed:
+    arithmetic, square roots and logarithms, sums and counts, sorting, distance formulas, and parsing the
+    data file. A built-in that performs the method itself, such as R's <code>lm()</code> or SQL's{' '}
+    <code>regr_slope</code>, makes an implementation "built-in" instead.
+  </p>
+
   <h2>Built-in features are allowed, and labeled</h2>
   <p>
     Some tools ship data science features of their own, such as PostgreSQL's <code>regr_slope</code>, R's{' '}
