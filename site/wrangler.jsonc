@@ -3,6 +3,8 @@
 {
   "name": "dswithx",
   "compatibility_date": "2026-10-29",
+  // Serve only at dswithx.com, not also at *.workers.dev.
+  "workers_dev": false,
   "assets": {
     "directory": "./dist",
     // Serve dist/404.html, with a 404 status, for unknown paths.

@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { LANGUAGES_FIRST } from '../site';
 
 // Astro runs from site/, so the repository root is one level up.
 export const ROOT = path.resolve(process.cwd(), '..');
@@ -14,6 +15,15 @@ export const readRepoFile = (repoPath: string) =>
   fs.readFileSync(path.join(ROOT, repoPath), 'utf8');
 
 export type Language = CollectionEntry<'languages'>;
+
+/** Sort order for languages: LANGUAGES_FIRST in order, then by name. */
+function compareLanguages(a: Language, b: Language) {
+  const rank = (l: Language) => {
+    const i = LANGUAGES_FIRST.indexOf(l.id);
+    return i === -1 ? LANGUAGES_FIRST.length : i;
+  };
+  return rank(a) - rank(b) || a.data.name.localeCompare(b.data.name);
+}
 
 export interface Implementation {
   concept: string;
@@ -31,7 +41,7 @@ export async function getConcepts() {
 
 export async function getLanguages() {
   const languages = await getCollection('languages');
-  return languages.sort((a, b) => a.data.name.localeCompare(b.data.name));
+  return languages.sort(compareLanguages);
 }
 
 function entryFile(concept: string, slug: string) {
@@ -41,7 +51,7 @@ function entryFile(concept: string, slug: string) {
   return { name, path: `${dir}/${name}`, code: readRepoFile(`${dir}/${name}`) };
 }
 
-/** Every implementation, ordered by language name then folder slug. */
+/** Every implementation, ordered by language (see compareLanguages) then folder slug. */
 export async function getImplementations(concept?: string): Promise<Implementation[]> {
   const [metas, notes, languages] = await Promise.all([
     getCollection('implementations'),
@@ -64,7 +74,7 @@ export async function getImplementations(concept?: string): Promise<Implementati
     })
     .filter((i) => !concept || i.concept === concept);
   return impls.sort(
-    (a, b) => a.language.data.name.localeCompare(b.language.data.name) || a.slug.localeCompare(b.slug),
+    (a, b) => compareLanguages(a.language, b.language) || a.slug.localeCompare(b.slug),
   );
 }
 
