@@ -1,7 +1,7 @@
 export const SITE_NAME = 'DS with X';
 
 // Until launch, ask search engines not to index the site. Set to true at launch.
-export const LAUNCHED = false;
+export const LAUNCHED = true;
 
 // Languages listed first, in this order, everywhere languages appear (tabs,
 // coverage grid, language index); the rest follow alphabetically.
