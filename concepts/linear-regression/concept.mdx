@@ -73,7 +73,7 @@ standard deviation of 6 we put in.
 None of these implementations calls a ready-made regression or correlation
 function, even where the language has one: no `lm()` or `cor()` in R, no
 `statistics.linear_regression` in Python, no `regr_slope` or `corr` in
-PostgreSQL. They don't call a built-in mean either. They do use everyday building blocks:
+PostgreSQL, no backslash solve, `X \ y`, in Julia. They don't call a built-in mean either. They do use everyday building blocks:
 arithmetic, a square root, and in most languages a built-in `sum`
 (PostgreSQL adds `count`).
 
