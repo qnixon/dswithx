@@ -1,0 +1,4 @@
+title: Logistic regression
+summary: Predict a yes-or-no outcome by fitting probabilities with gradient descent.
+order: 6
+difficulty: intermediate

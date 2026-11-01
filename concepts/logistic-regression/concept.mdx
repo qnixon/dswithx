@@ -1,0 +1,97 @@
+Logistic regression predicts a yes-or-no outcome. Instead of fitting a
+straight line through the answers, it fits a probability between 0 and 1,
+and calls "yes" when that probability is at least 0.5. It's the standard
+first model for classification, and a neural network answering a yes-or-no
+question ends with the same calculation.
+
+## The dataset
+
+`data.csv` holds 200 synthetic students with weekly study `hours`, nightly
+`sleep` hours, and whether they `passed` the exam (1) or not (0). We drew it
+once with `make_data.py` (fixed seed 20261101): each student passed with
+probability $1 / (1 + e^{-z})$, where $z = -6 + 0.6 \times \text{hours} +
+0.5 \times \text{sleep}$. The `split` column marks 150 rows as `train` and 50
+as `test`. 92 of the 150 training students passed.
+
+Why not use linear regression? Fit a line to the 0s and 1s here and it
+predicts a 1.11 "probability" for one student and −0.07 for another: 23 of
+the 150 land outside 0 to 1.
+
+## The model
+
+Logistic regression computes a score $z$ from the features, then squeezes
+it into a probability with the **sigmoid** function:
+
+$$
+z = w_0 + w_1 x_1 + w_2 x_2
+\qquad
+p = \sigma(z) = \frac{1}{1 + e^{-z}}
+$$
+
+A score of 0 gives exactly 0.5. Large positive scores approach 1 and large
+negative ones approach 0, but never reach them.
+
+To judge a set of weights, we use the **log-loss**: the average of
+$-\log p$ for students who passed and $-\log(1 - p)$ for those who didn't.
+Confident wrong answers cost a lot; confident right ones cost almost
+nothing. Unlike least squares, there is no formula that solves for the best
+weights directly, so we search for them.
+
+## The method
+
+1. **Scale** each feature to mean 0 and standard deviation 1, using the
+   training rows' mean and sample standard deviation. Study hours (sd 2.71)
+   and sleep (sd 1.40) then move on the same scale, so one learning rate
+   suits both.
+2. **Start** with every weight at 0. Every student gets $p = 0.5$, and the
+   log-loss is $\log 2 = 0.693147$.
+3. **Step** downhill 1,000 times. The gradient of the log-loss for weight
+   $j$ is the average of $(p_i - y_i)\,x_{ij}$ over the training rows, and
+   each step subtracts 0.5 times it from every weight at once.
+
+The first step already moves the hours weight furthest, to 0.156, because
+the students who passed mostly studied more than average. The loss falls to
+0.641 after one step, 0.471 after 10, and 0.419409 after 100; by step 200 it
+has settled at 0.419364. Newton's method, which homes in on the best weights
+in a few large steps, lands on the same six decimals, so 1,000 steps is plenty.
+
+## Reading the results
+
+The fitted weights are an intercept of 0.753594, 1.924812 for hours, and
+0.367271 for sleep. On the scaled features, one standard deviation more
+study multiplies the odds of passing by $e^{1.92} = 6.85$; one more of sleep
+multiplies them by 1.44.
+
+Take a test student who studied 3.7 hours and slept 6.4. Scaled, that's
+−0.7284 for hours and 0.0109 for sleep, so
+$z = 0.7536 + 1.9248 \times (-0.7284) + 0.3673 \times 0.0109 = -0.644$ and
+$p = 0.344$. The model says "fail", and the student did fail.
+
+The model gets 37 of the 50 test students right, an accuracy of 0.74.
+Predicting "pass" for everyone would score 0.68, since 34 of the 50 passed.
+Nine of the 13 misses are students who passed despite a low predicted
+probability. Converted back to hours, the fit finds 0.71 per study hour and
+0.26 per hour of sleep, against the 0.6 and 0.5 we generated with: 150
+students is not much data, and sleep's smaller effect is the harder one to
+pin down.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made logistic regression. Of the
+ten languages, only R ships one, `glm(..., family = binomial)`, which finds
+the same weights to six decimals in five steps of a cleverer method. The
+rest use general tools: `exp`, `log`, square roots, sums, and loops.
+
+Watch how each takes one step. R and APL do it with matrix products
+(`%*%` and `+.×`), with no loop over students. Python, Ruby, and
+JavaScript build each new list of weights from the old one, and Rust sums
+the gradient with iterator chains. awk, COBOL, and Go add it up in an
+explicit loop, and PostgreSQL, which has no loops at all, makes each step
+one row of a `WITH RECURSIVE` query.
+
+Watch, too, that every weight moves from the same gradient. Go's notes show
+what happens if you update inside the loop over students: the intercept
+comes out 0.758788 instead of 0.753594. And watch COBOL, which does all of
+this in fixed-point decimals. With 18 decimal places it matches the
+floating-point languages to 14, but its 150,000 calls to `EXP` make it the
+slowest version here.

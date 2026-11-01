@@ -1,0 +1,8 @@
+train_count 150
+test_count 50
+intercept 0.753594
+weight_hours 1.924812
+weight_sleep 0.367271
+log_loss 0.419364
+correct 37
+accuracy 0.740000
