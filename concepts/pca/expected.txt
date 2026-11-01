@@ -1,0 +1,15 @@
+count 100
+eigenvalue_1 2.496154
+explained_1 0.624038
+pc1_math 0.504100
+pc1_physics 0.517770
+pc1_reading 0.457228
+pc1_writing 0.518401
+eigenvalue_2 1.110197
+explained_2 0.277549
+pc2_math 0.497992
+pc2_physics 0.468590
+pc2_reading -0.584599
+pc2_writing -0.436659
+student_1_pc1 1.712316
+student_1_pc2 1.113676

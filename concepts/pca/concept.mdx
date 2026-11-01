@@ -1,0 +1,87 @@
+Principal component analysis (PCA) finds the directions in which your data
+varies most. When several columns move together, a few of these directions,
+the **principal components**, can stand in for all of them. PCA is used to
+compress data, to plot many columns in two dimensions, and to find the
+hidden factors behind a set of measurements.
+
+## The dataset
+
+`data.csv` holds 100 synthetic students' scores, from 0 to 100, in `math`,
+`physics`, `reading`, and `writing`. We drew it once with `make_data.py`
+(fixed seed 20261103) from two hidden traits: a general ability that lifts
+all four scores, and a lean that raises math and physics while lowering
+reading and writing, or the reverse. Then we added noise. PCA never sees
+those traits; it has only the scores.
+
+## The method
+
+1. **Standardize** each column to mean 0 and (sample) standard deviation 1,
+   so that no subject counts more just because its scores spread wider.
+2. **Build the correlation matrix**, a 4×4 table of how strongly each pair
+   of subjects moves together. Math and physics correlate at 0.824, and
+   reading and writing at 0.767, but math and reading only at 0.278.
+3. **Find its top eigenvector** by power iteration. Start with
+   $v = (1, 0, 0, 0)$, then repeat $v \leftarrow Mv / \lVert Mv \rVert$.
+   Each multiplication stretches $v$ most along the direction the matrix
+   stretches most, so $v$ turns toward it. The **eigenvalue**, how much
+   variance lies along that direction, is $\lambda = v^\top M v$.
+4. **Deflate**: subtract $\lambda v v^\top$ from the matrix, which removes
+   the first component, then repeat step 3 for the second.
+5. **Fix the sign.** If $v$ is an eigenvector, so is $-v$, so we agree to
+   make each one's first entry positive. Starting from $(1, 0, 0, 0)$
+   already lands on that version, but every implementation checks anyway,
+   so the rule doesn't depend on the starting point.
+
+We run 1,000 steps, which is generous. After one step, $v$ is
+$(0.724, 0.597, 0.202, 0.280)$, still leaning toward where it started.
+After 5 steps it's $(0.513, 0.526, 0.447, 0.511)$, and from step 18 on, all
+six decimals stay fixed. The second component settles even faster, in 9
+steps, because its eigenvalue stands further above the next one.
+
+## Reading the results
+
+| | Component 1 | Component 2 |
+|---|---|---|
+| Eigenvalue | 2.496154 | 1.110197 |
+| Share of variance | 0.624 | 0.278 |
+| math | 0.504 | 0.498 |
+| physics | 0.518 | 0.469 |
+| reading | 0.457 | −0.585 |
+| writing | 0.518 | −0.437 |
+
+The four standardized columns have a total variance of 4, so the first
+component carries $2.496 / 4 = 62.4\%$ of it, and the two together carry
+90.2%. Two numbers per student keep nine-tenths of what four did.
+
+The components are the hidden traits. The first weights every subject
+about equally: that's general ability, and the true direction was 0.5 for
+each. The second gives math and physics positive weights and reading and
+writing negative ones: that's the lean, and the true direction was
+$(0.543, 0.453, -0.543, -0.453)$.
+
+Take the first student, who scored 82, 91, 74, and 72. Standardized, that's
+$(1.079, 1.800, 0.337, 0.160)$. Multiplying by each component gives
+1.712 on the first, well above average overall, and 1.114 on the second,
+leaning toward math and physics.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made PCA or eigenvalue routine.
+Three languages have one: R's `prcomp()` and `eigen()`, Julia's `eigen`, and
+`Matrix#eigensystem` from Ruby's bundled `matrix` gem. All three find the
+same eigenvalues as power iteration, but R and Julia return the first
+component with every sign flipped, and Ruby flips the second. That's why
+the sign rule matters.
+
+Watch how each holds a matrix. R, Julia, and APL have matrices built in, so
+a power-iteration step is one product: `%*%`, `*`, or `+.×`. APL also needs
+no loop, since `⍣` repeats the step 1,000 times. Python, Ruby, and
+JavaScript use arrays of rows with small helper functions, and Go and Rust
+use fixed-size arrays whose length is part of the type. COBOL nests one
+table inside another, awk keys a single array by `m[i, j]`, and PostgreSQL
+stores one row per entry, so a matrix-vector product becomes a `GROUP BY`.
+
+And watch COBOL's precision. It works in fixed-point decimals, and its
+results match the floating-point languages to 14 decimal places. Power
+iteration corrects its own rounding at every step, so even 9 decimal places
+would pass.
