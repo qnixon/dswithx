@@ -66,15 +66,15 @@ None of these implementations calls a ready-made kNN classifier. They use
 general tools: arithmetic, square roots, Python's `math.dist`, sorting, and
 counting helpers such as `Counter`, `tally`, `table()`, and SQL's `count`.
 Go, Rust, and JavaScript have no counter type, so they count votes in a map
-or a short list. awk and COBOL skip the square root and compare squared distances.
+or a short list, and APL compares every neighbor with every label at once. awk and COBOL skip the square root and compare squared distances.
 
-Watch how each finds the 5 nearest. Seven of the nine sort all 150
+Watch how each finds the 5 nearest. Eight of the ten sort all 150
 distances for every test seed; awk and COBOL pick the nearest unused seed
 five times over.
 
-Watch tie-breaking too. On an exactly equal distance, all nine keep the
-earlier training row. Python's `sorted`, R's `order()`, Rust's `sort_by`, and
-JavaScript's `sort` are stable. Go uses `slices.SortStableFunc`, because its
+Watch tie-breaking too. On an exactly equal distance, all ten keep the
+earlier training row. Python's `sorted`, R's `order()`, Rust's `sort_by`,
+JavaScript's `sort`, and APL's `⍋` are stable. Go uses `slices.SortStableFunc`, because its
 plain `SortFunc` isn't guaranteed to be. Ruby's `sort_by` isn't stable, so
 Ruby adds the file position to its sort key. But
 floating point decides what counts as equal. The test seed at 6.06 × 3.21
