@@ -7,18 +7,19 @@ image: postgres:18.6-trixie
 highlight: sql
 ---
 
-<!-- Placeholder text: to be written. -->
-
-SQL is the language most data already lives in. PostgreSQL adds window
-functions, common table expressions, and a rich set of statistical
-aggregates, so a lot of data science can happen without the data leaving the
-database.
+SQL is where most data already lives, and PostgreSQL brings a lot of
+statistics with it: `avg`, `stddev_samp`, `var_samp`, `percentile_cont`,
+`corr`, and `regr_slope` are all built-in aggregates. The from-scratch
+versions avoid them and use only basic aggregates such as `sum`, `count`,
+`min`, and `max`, plus ordinary arithmetic and window functions. SQL describes results rather than steps, so iterative
+methods take some ingenuity: k-means repeats its two steps with a recursive
+query, `WITH RECURSIVE`.
 
 ## Quirks
 
-- The harness loads `data.csv` into a table named `data`; numeric columns
-  become `double precision`. Tables have no row order, so an extra `row_id`
-  column numbers the rows in file order, from 1.
-- The final query returns two columns, `name` and `value`, one row per result.
-- Built-in aggregates such as `avg()`, `stddev_samp()`, and
-  `percentile_cont()` are avoided in from-scratch versions.
+- The runner loads `data.csv` into a table named `data`, with numeric
+  columns as `double precision` and a `row_id` column numbering rows in
+  file order, from 1. Tables otherwise have no order.
+- The final query returns two columns, `name` and `value`, one row per
+  result.
+- Integer division truncates: `7 / 2` is `3`, and `7 / 2.0` is `3.5`.

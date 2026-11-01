@@ -7,15 +7,17 @@ image: r-base:4.6.2 (recommended packages removed)
 highlight: r
 ---
 
-<!-- Placeholder text: to be written. -->
-
-R was built by statisticians for statistics, so most of what this site
-implements by hand is already a single built-in function. Here the
-from-scratch versions avoid those functions to show the arithmetic.
+R was built by statisticians for statistics, so almost everything this
+site implements by hand is already one built-in call: `mean()`, `median()`,
+`var()`, `sd()`, `cor()`, `lm()`, and `kmeans()` all come with base R. The
+from-scratch versions avoid them and show the arithmetic instead. R's
+packages from CRAN are where most of its data science lives; this image
+removes even the recommended packages that normally ship with R, leaving
+only base R and its standard packages, such as `stats` and `utils`.
 
 ## Quirks
 
-- Vectors are 1-indexed, and arithmetic is vectorized: `values - m` subtracts
-  `m` from every element at once.
-- `mean()`, `median()`, `var()`, and `sd()` are built in; from-scratch
-  implementations avoid them.
+- Arithmetic is vectorized: `x - mean(x)` subtracts the mean from every
+  element at once, with no loop.
+- Vectors are indexed from 1.
+- `var()` divides by n − 1, like the formulas on this site.
