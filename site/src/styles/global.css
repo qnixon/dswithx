@@ -121,6 +121,9 @@ pre {
   font-size: 0.875rem;
   tab-size: 4;
 }
+/* Plain-text diagrams, such as a drawn tree: tighter lines so box-drawing
+   characters join up. */
+pre[data-language="text"] { line-height: 1.2; }
 
 .container { max-width: var(--measure); margin: 0 auto; padding: 0 16px; }
 .container.wide { max-width: var(--wide); }

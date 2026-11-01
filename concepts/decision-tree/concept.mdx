@@ -1,0 +1,105 @@
+A decision tree predicts by asking a short series of yes-or-no questions,
+such as "Is the pressure at most 1000.95?" Each answer sends you down one
+branch until you reach a leaf, which holds the prediction. You can read the
+finished model out loud, which is why trees are popular, and they're the
+building block of random forests and gradient boosting.
+
+## The dataset
+
+`data.csv` holds 200 synthetic days with `humidity` (%), air `pressure`
+(hPa), and `wind` speed (km/h), and whether it rained the next day (`rain`
+is `yes` or `no`). We drew it once with `make_data.py` (fixed seed
+20261102) from a simple rule: rain when humidity is at least 75 and
+pressure is below 1012, or whenever pressure is below 1000. Wind plays no
+part. Then we flipped 10% of the labels at random, because real weather
+never follows a rule exactly. The `split` column marks 150 rows as `train`
+and 50 as `test`, and 53 of the 150 training days had rain.
+
+## Measuring purity
+
+A good question splits the days into groups that mostly agree. The **Gini
+impurity** measures disagreement: if a fraction $p$ of a group had rain,
+
+$$
+G = 1 - p^2 - (1 - p)^2
+$$
+
+That's 0 for a group that all agrees and 0.5 for an even mix. The 150
+training days, with $p = 53/150$, score 0.4570. To score a split, we
+average the two sides' impurities, weighted by their sizes.
+
+## The method
+
+1. **Try every split.** For each feature, sort its distinct values and try
+   a threshold halfway between each neighboring pair: 228 thresholds at
+   the start. Keep the one with the lowest weighted impurity. On a tie,
+   the first one tried wins: features in column order, thresholds from
+   smallest to largest.
+2. **Split and repeat** on each side.
+3. **Stop** when a group is pure, has fewer than 5 days, or is 3 questions
+   deep, or when no split lowers the impurity. A leaf predicts the
+   majority, and an even split predicts no rain.
+
+The first question is easy to check by hand. Splitting at pressure 1000.95
+leaves 34 rainy days out of 36 on one side (impurity 0.1049) and 19 out of
+114 on the other (0.2778), for a weighted score of
+$(36 \times 0.1049 + 114 \times 0.2778) / 150 = 0.2363$. The best humidity
+split only reaches 0.4322, and the best wind split 0.4494.
+
+## Reading the tree
+
+```text
+pressure <= 1000.95?
+├─ yes: humidity <= 63.5?
+│  ├─ yes: humidity <= 54?
+│  │  ├─ yes: rain     14 of 14 rained
+│  │  └─ no:  no rain   1 of 3
+│  └─ no:  rain        19 of 19
+└─ no:  humidity <= 72.5?
+   ├─ yes: wind <= 31.5?
+   │  ├─ yes: no rain   2 of 52
+   │  └─ no:  no rain   3 of 18
+   └─ no:  pressure <= 1013.7?
+      ├─ yes: rain     11 of 13
+      └─ no:  no rain   3 of 31
+```
+
+The tree found the rule's shape, with cutoffs of 1000.95, 72.5, and 1013.7
+against the true 1000, 75, and 1012. It also learned noise. The three days
+with humidity between 54 and 63.5 are a pocket carved out for two flipped
+labels, and the wind question sharpens the impurity without changing a
+single prediction: both of its leaves say no rain.
+
+On the 50 test days, the tree is right 44 times, an accuracy of 0.88.
+Always predicting no rain would score 0.72. Take a test day with humidity
+82, pressure 1012.8, and wind 24. The tree answers no, no, then yes, and
+predicts rain. The true rule says no rain, because 1012.8 isn't below
+1012, and the day was dry.
+
+That's overfitting in miniature. On the training days the tree scores
+0.927, better than the true rule's 0.913. On the test days it scores 0.88
+to the true rule's 0.92.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made tree. The usual one in R,
+`rpart()`, is a recommended package that this site's R image leaves out,
+and none of the other ten languages ships one. They use general tools:
+sorting, counting, and arithmetic.
+
+Watch how each holds the tree, since a tree is the first data structure on
+this site that contains itself. Rust uses an enum whose children must be
+boxed, Ruby uses two `Data` classes and pattern matching, Julia uses two
+types and multiple dispatch, Go uses a struct with `nil` children, and
+Python, R, and JavaScript use tuples, nested lists, or plain objects. awk
+and APL flatten the tree into parallel arrays in preorder.
+
+Watch, too, how each grows it. Nine languages write `grow` as a function
+that calls itself on each side. COBOL can't: a paragraph can perform
+itself, but every level shares the same variables, so it keeps an explicit
+stack of nodes. PostgreSQL grows the tree one level at a time with
+`WITH RECURSIVE`, with each row naming its node by a path such as `'LR'`.
+
+And watch the split search. R and APL build a table of days by thresholds
+and score every threshold at once, with no loop over thresholds. The rest
+try each threshold in turn.

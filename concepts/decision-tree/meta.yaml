@@ -1,0 +1,4 @@
+title: Decision tree
+summary: Learn yes-or-no rules by repeatedly splitting the data where it separates best.
+order: 7
+difficulty: intermediate
