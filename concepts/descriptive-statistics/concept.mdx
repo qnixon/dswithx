@@ -65,7 +65,7 @@ Python, R, Julia, and PostgreSQL do have them, and their tabs have a
 **Built-in** switch that shows the short version. All four divide by n − 1,
 but the names differ: `variance` in Python, `var` in R and Julia, and
 `var_samp` in PostgreSQL, which has no `median` either, only
-`percentile_cont(0.5)`.
+`percentile_cont(0.5)`. Octave has `mean`, `median`, `var`, and `std` too.
 
 The from-scratch versions use everyday building blocks: arithmetic, a
 square root, sorting, and in most languages a built-in `sum`. PostgreSQL also uses SQL's basic `count`, `min`,
@@ -74,4 +74,5 @@ straight off the sorted values. Watch for how each one sorts (needed for the
 median), how it avoids integer-division traps when averaging, how much
 ceremony it takes to print a number to six decimal places. C, with no
 array that grows, doubles its own with `realloc`, and Haskell, with no
-loops, gets every total from a fold such as `sum`.
+loops, gets every total from a fold such as `sum`. Octave squares every
+deviation at once with `.^`, where the dot means "each element".

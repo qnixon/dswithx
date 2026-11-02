@@ -11,7 +11,7 @@ export const LANGUAGES_FIRST = ['python'];
 // order. A language missing from every group appears in a final "Other" row.
 export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
   { label: 'Scripting', languages: ['python', 'javascript', 'ruby', 'awk'] },
-  { label: 'Arrays and math', languages: ['r', 'julia', 'apl', 'fortran'] },
+  { label: 'Arrays and math', languages: ['r', 'julia', 'octave', 'apl', 'fortran'] },
   { label: 'Systems', languages: ['c', 'go', 'rust'] },
   { label: 'Functional', languages: ['haskell'] },
   { label: 'Business and databases', languages: ['cobol', 'postgresql'] },
