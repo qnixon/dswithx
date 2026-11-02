@@ -74,7 +74,11 @@ straight off the sorted values. Watch for how each one sorts (needed for the
 median), how it avoids integer-division traps when averaging, how much
 ceremony it takes to print a number to six decimal places: Java's
 `printf` follows the computer's language settings, so it passes
-`Locale.ROOT` to keep the decimal point a point. C, with no
-array that grows, doubles its own with `realloc`, and Haskell, with no
-loops, gets every total from a fold such as `sum`. Octave squares every
+`Locale.ROOT` to keep the decimal point a point.
+
+C, with no array that grows, doubles its own with `realloc`, while C++'s
+`std::vector` grows by itself. C++'s `std::accumulate` hides a trap: start
+it from `0` instead of `0.0` and it adds whole numbers, quietly dropping
+every fraction. Haskell, with no loops, gets every total from a fold such
+as `sum`. Octave squares every
 deviation at once with `.^`, where the dot means "each element".

@@ -84,7 +84,7 @@ to the true rule's 0.92.
 
 None of these implementations calls a ready-made tree. The usual one in R,
 `rpart()`, is a recommended package that this site's R image leaves out,
-and none of the other fifteen languages ships one. They use general tools:
+and none of the other sixteen languages ships one. They use general tools:
 sorting, counting, and arithmetic.
 
 Watch how each holds the tree, since a tree is the first data structure on
@@ -93,11 +93,12 @@ boxed, Ruby uses two `Data` classes and pattern matching, Julia uses two
 types and multiple dispatch, Haskell uses an algebraic data type that
 names itself with no boxes or pointers, Java
 uses a sealed interface and two records, Go and C use a struct with `nil`
-or `NULL` children, Octave nests structs inside structs, and Python, R, and JavaScript use tuples, nested lists, or plain objects.
+or `NULL` children, C++ uses a struct whose `std::unique_ptr` children
+free themselves, Octave nests structs inside structs, and Python, R, and JavaScript use tuples, nested lists, or plain objects.
 Fortran keeps an array of node records, and awk and APL flatten the tree
 into parallel arrays, all in preorder.
 
-Watch, too, how each grows it. Fourteen languages write `grow` as a function
+Watch, too, how each grows it. Fifteen languages write `grow` as a function
 that calls itself on each side; Fortran has to mark it `recursive`. COBOL
 can't: a paragraph can perform itself, but every level shares the same
 variables, so it keeps an explicit stack of nodes. PostgreSQL grows the tree one level at a time with

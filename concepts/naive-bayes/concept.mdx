@@ -77,11 +77,11 @@ emails apart.
 ## What to watch for across languages
 
 None of these implementations uses a naive Bayes library, and none of the
-sixteen languages ships one. They use only general tools: counting (such as Python's
+seventeen languages ships one. They use only general tools: counting (such as Python's
 `Counter` or SQL's `count(*)`), logarithms, and comparing label names.
 
 Watch how each keys its counts by feature, value, and label. Python, Ruby,
-Julia, Rust, and Haskell use a tuple or array as the key (Haskell, with no
+Julia, Rust, C++, and Haskell use a tuple or array as the key (Haskell, with no
 map type in `base`, keeps its counts in association lists), Go uses a
 small struct and Java a record, awk and JavaScript join the three into one string, and COBOL
 indexes a three-dimensional table by position. R, APL, Fortran,
