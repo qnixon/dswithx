@@ -84,10 +84,10 @@ little lower than our 423.63. Passing the first three points and
 The from-scratch versions use general tools: a distance formula (Python's
 `math.dist`, Go's `math.Hypot`, Fortran's `norm2`, written out by hand
 elsewhere), sums, counts, and picking the smallest value. Watch how each
-holds 2-D points: tuples, nested arrays, a matrix, structs in Go, C, and C++, records in Java,
+holds 2-D points: tuples, nested arrays, a matrix, structs in Go, C, and C++, records in Java, a `defstruct` in Common Lisp,
 fixed-size arrays in Rust, columns of a 2-D array in Fortran, separate x
 and y arrays in awk and PostgreSQL, or a table of records in COBOL. Watch
-how each notices that nothing changed: fourteen compare the whole assignment
+how each notices that nothing changed: fifteen compare the whole assignment
 with the last one, while awk, COBOL, and C set a flag as they go. And
 watch the two languages with no loops: Haskell's `run` calls itself with
 the moved centroids, and PostgreSQL repeats the two steps with

@@ -79,6 +79,7 @@ ceremony it takes to print a number to six decimal places: Java's
 C, with no array that grows, doubles its own with `realloc`, while C++'s
 `std::vector` grows by itself. C++'s `std::accumulate` hides a trap: start
 it from `0` instead of `0.0` and it adds whole numbers, quietly dropping
-every fraction. Haskell, with no loops, gets every total from a fold such
+every fraction. Common Lisp reads `28.6` as a single float, good to about 7
+digits, unless told otherwise. Haskell, with no loops, gets every total from a fold such
 as `sum`. Octave squares every
 deviation at once with `.^`, where the dot means "each element".
