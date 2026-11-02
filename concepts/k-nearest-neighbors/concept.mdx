@@ -63,16 +63,17 @@ feature to a standard deviation of 1.
 ## What to watch for across languages
 
 None of these implementations calls a ready-made kNN classifier. They use
-general tools: arithmetic, square roots, Python's `math.dist`, sorting, and
+general tools: arithmetic, square roots, Python's `math.dist`, Fortran's `norm2`, sorting, and
 counting helpers such as `Counter`, `tally`, `table()`, and SQL's `count`.
 Go, Rust, JavaScript, and Julia have no counter type, so they count votes in a map
-or a short list, and APL compares every neighbor with every label at once. awk and COBOL skip the square root and compare squared distances.
+or a short list, Fortran counts matching labels with `count`, and APL compares every neighbor with every label at once. awk and COBOL skip the square root and compare squared distances.
 
-Watch how each finds the 5 nearest. Nine of the eleven sort all 150
-distances for every test seed; awk and COBOL pick the nearest unused seed
-five times over.
+Watch how each finds the 5 nearest. Nine of the twelve sort all 150
+distances for every test seed; awk, COBOL, and Fortran pick the nearest
+unused seed five times over. Fortran's `minloc` returns the first of equal
+distances, which keeps the same order a stable sort would.
 
-Watch tie-breaking too. On an exactly equal distance, all eleven keep the
+Watch tie-breaking too. On an exactly equal distance, all twelve keep the
 earlier training row. Python's `sorted`, R's `order()`, Rust's `sort_by`,
 JavaScript's and Julia's `sort`, and APL's `⍋` are stable. Go uses `slices.SortStableFunc`, because its
 plain `SortFunc` isn't guaranteed to be. Ruby's `sort_by` isn't stable, so

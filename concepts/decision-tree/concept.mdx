@@ -84,20 +84,21 @@ to the true rule's 0.92.
 
 None of these implementations calls a ready-made tree. The usual one in R,
 `rpart()`, is a recommended package that this site's R image leaves out,
-and none of the other ten languages ships one. They use general tools:
+and none of the other eleven languages ships one. They use general tools:
 sorting, counting, and arithmetic.
 
 Watch how each holds the tree, since a tree is the first data structure on
 this site that contains itself. Rust uses an enum whose children must be
 boxed, Ruby uses two `Data` classes and pattern matching, Julia uses two
 types and multiple dispatch, Go uses a struct with `nil` children, and
-Python, R, and JavaScript use tuples, nested lists, or plain objects. awk
-and APL flatten the tree into parallel arrays in preorder.
+Python, R, and JavaScript use tuples, nested lists, or plain objects.
+Fortran keeps an array of node records, and awk and APL flatten the tree
+into parallel arrays, all in preorder.
 
-Watch, too, how each grows it. Nine languages write `grow` as a function
-that calls itself on each side. COBOL can't: a paragraph can perform
-itself, but every level shares the same variables, so it keeps an explicit
-stack of nodes. PostgreSQL grows the tree one level at a time with
+Watch, too, how each grows it. Ten languages write `grow` as a function
+that calls itself on each side; Fortran has to mark it `recursive`. COBOL
+can't: a paragraph can perform itself, but every level shares the same
+variables, so it keeps an explicit stack of nodes. PostgreSQL grows the tree one level at a time with
 `WITH RECURSIVE`, with each row naming its node by a path such as `'LR'`.
 
 And watch the split search. R and APL build a table of days by thresholds
