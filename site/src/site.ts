@@ -14,6 +14,7 @@ export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
   { label: 'Arrays and math', languages: ['r', 'julia', 'octave', 'apl', 'fortran'] },
   { label: 'Systems', languages: ['c', 'cpp', 'go', 'rust', 'swift'] },
   { label: 'Functional and logic', languages: ['haskell', 'common-lisp', 'prolog'] },
+  { label: 'Teaching', languages: ['basic'] },
   { label: 'Business and databases', languages: ['java', 'cobol', 'postgresql'] },
 ];
 

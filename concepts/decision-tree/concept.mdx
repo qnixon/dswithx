@@ -84,7 +84,7 @@ to the true rule's 0.92.
 
 None of these implementations calls a ready-made tree. The usual one in R,
 `rpart()`, is a recommended package that this site's R image leaves out,
-and none of the other nineteen languages ships one. They use general tools:
+and none of the other twenty languages ships one. They use general tools:
 sorting, counting, and arithmetic.
 
 Watch how each holds the tree, since a tree is the first data structure on
@@ -97,13 +97,13 @@ shaped like its own code, Prolog uses a plain term with one clause per kind
 of node, Go and C use a struct with `nil`
 or `NULL` children, C++ uses a struct whose `std::unique_ptr` children
 free themselves, Octave nests structs inside structs, and Python, R, and JavaScript use tuples, nested lists, or plain objects.
-Fortran keeps an array of node records, and awk and APL flatten the tree
+Fortran keeps an array of node records, and awk, APL, and BASIC flatten the tree
 into parallel arrays, all in preorder.
 
 Watch, too, how each grows it. Eighteen languages write `grow` as a function
 that calls itself on each side; Fortran has to mark it `recursive`. COBOL
-can't: a paragraph can perform itself, but every level shares the same
-variables, so it keeps an explicit stack of nodes. PostgreSQL grows the tree one level at a time with
+and BASIC can't: a paragraph can perform itself, and a subroutine can `GOSUB` itself, but every level shares the same
+variables, so both keep an explicit stack of nodes. PostgreSQL grows the tree one level at a time with
 `WITH RECURSIVE`, with each row naming its node by a path such as `'LR'`.
 
 And watch the split search. R, APL, and Octave build a table of days by thresholds

@@ -1,6 +1,7 @@
 ---
 import { Code } from 'astro:components';
 import { githubUrl } from '../site';
+import { basicGrammar } from '../lib/basic-grammar';
 
 interface Props {
   code: string;
@@ -10,6 +11,8 @@ interface Props {
 }
 
 const { code, filename, repoPath, lang = 'plaintext' } = Astro.props;
+// Languages Shiki doesn't bundle get a grammar defined in the site.
+const grammar = lang === 'basic' ? basicGrammar : lang;
 ---
 
 <figure class="code-block">
@@ -20,7 +23,7 @@ const { code, filename, repoPath, lang = 'plaintext' } = Astro.props;
       <a href={githubUrl(repoPath)}>View on GitHub</a>
     </span>
   </figcaption>
-  <Code code={code} lang={lang as any} themes={{ light: 'github-light', dark: 'github-dark' }} defaultColor={false} />
+  <Code code={code} lang={grammar as any} themes={{ light: 'github-light', dark: 'github-dark' }} defaultColor={false} />
 </figure>
 
 <script>
