@@ -14,7 +14,7 @@ export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
   { label: 'Arrays and math', languages: ['r', 'julia', 'octave', 'apl', 'fortran'] },
   { label: 'Systems', languages: ['c', 'go', 'rust'] },
   { label: 'Functional', languages: ['haskell'] },
-  { label: 'Business and databases', languages: ['cobol', 'postgresql'] },
+  { label: 'Business and databases', languages: ['java', 'cobol', 'postgresql'] },
 ];
 
 // The home page names every language until there are more than this many;
