@@ -77,9 +77,10 @@ than part of the standard library, so it's left out.
 
 Watch how each holds a matrix. R, Julia, Fortran, and APL have matrices
 built in, so a power-iteration step is one product: `%*%`, `*`, `matmul`,
-or `+.×`. APL also needs no loop, since `⍣` repeats the step 1,000 times. Python, Ruby, and
-JavaScript use arrays of rows with small helper functions, and Go, Rust, and C
-use fixed-size arrays whose length is part of the type. COBOL nests one
+or `+.×`. APL also needs no loop, since `⍣` repeats the step 1,000 times,
+and neither does Haskell, whose `iterate` builds the endless list of steps.
+Python, Ruby, JavaScript, and Haskell use arrays or lists of rows with
+small helper functions, and Go, Rust, and C use fixed-size arrays whose length is part of the type. COBOL nests one
 table inside another, awk keys a single array by `m[i, j]`, and PostgreSQL
 stores one row per entry, so a matrix-vector product becomes a `GROUP BY`.
 

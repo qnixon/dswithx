@@ -72,5 +72,6 @@ square root, sorting, and in most languages a built-in `sum`. PostgreSQL also us
 and `max` aggregates; the other languages read the minimum and maximum
 straight off the sorted values. Watch for how each one sorts (needed for the
 median), how it avoids integer-division traps when averaging, how much
-ceremony it takes to print a number to six decimal places, and how C, with
-no array that grows, doubles its own with `realloc`.
+ceremony it takes to print a number to six decimal places. C, with no
+array that grows, doubles its own with `realloc`, and Haskell, with no
+loops, gets every total from a fold such as `sum`.
