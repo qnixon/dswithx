@@ -76,14 +76,15 @@ emails apart.
 
 ## What to watch for across languages
 
-None of these implementations uses a naive Bayes library, and none of the twelve
-languages ships one. They use only general tools: counting (such as Python's
+None of these implementations uses a naive Bayes library, and none of the
+thirteen languages ships one. They use only general tools: counting (such as Python's
 `Counter` or SQL's `count(*)`), logarithms, and comparing label names.
 
 Watch how each keys its counts by feature, value, and label. Python, Ruby, Julia,
 and Rust use a tuple or array as the key, Go uses a small struct, awk and
-JavaScript join the three into one string, and COBOL indexes a three-dimensional table by position. R, APL, and Fortran store no
-value counts; they recount matching training rows each time they score. PostgreSQL turns the
+JavaScript join the three into one string, and COBOL indexes a three-dimensional table by position. R, APL, Fortran,
+and C store no value counts; they recount matching training rows each time
+they score. PostgreSQL turns the
 three feature columns into rows first, so one `GROUP BY` counts them all the
 same way. And watch the tie rule: each language reaches "alphabetically
 first" in its own way.

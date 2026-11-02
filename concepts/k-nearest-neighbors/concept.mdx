@@ -63,21 +63,25 @@ feature to a standard deviation of 1.
 ## What to watch for across languages
 
 None of these implementations calls a ready-made kNN classifier. They use
-general tools: arithmetic, square roots, Python's `math.dist`, Fortran's `norm2`, sorting, and
-counting helpers such as `Counter`, `tally`, `table()`, and SQL's `count`.
-Go, Rust, JavaScript, and Julia have no counter type, so they count votes in a map
-or a short list, Fortran counts matching labels with `count`, and APL compares every neighbor with every label at once. awk and COBOL skip the square root and compare squared distances.
+general tools: arithmetic, square roots, Python's `math.dist`, Fortran's
+`norm2`, sorting, and counting helpers such as `Counter`, `tally`,
+`table()`, and SQL's `count`. Go, Rust, JavaScript, and Julia have no
+counter type, so they count votes in a map or a short list, C compares
+labels with `strcmp` and counts them in a loop, Fortran counts matching
+labels with `count`, and APL compares every neighbor with every label at
+once. awk and COBOL skip the square root and compare squared distances.
 
-Watch how each finds the 5 nearest. Nine of the twelve sort all 150
+Watch how each finds the 5 nearest. Ten of the thirteen sort all 150
 distances for every test seed; awk, COBOL, and Fortran pick the nearest
 unused seed five times over. Fortran's `minloc` returns the first of equal
 distances, which keeps the same order a stable sort would.
 
-Watch tie-breaking too. On an exactly equal distance, all twelve keep the
+Watch tie-breaking too. On an exactly equal distance, all thirteen keep the
 earlier training row. Python's `sorted`, R's `order()`, Rust's `sort_by`,
 JavaScript's and Julia's `sort`, and APL's `⍋` are stable. Go uses `slices.SortStableFunc`, because its
-plain `SortFunc` isn't guaranteed to be. Ruby's `sort_by` isn't stable, so
-Ruby adds the file position to its sort key. But
+plain `SortFunc` isn't guaranteed to be. Ruby's `sort_by` and C's `qsort`
+aren't stable, so Ruby adds the file position to its sort key, and C's
+comparison function breaks ties by row number. But
 floating point decides what counts as equal. The test seed at 6.06 × 3.21
 has two training seeds exactly 0.13 mm away. COBOL's decimal arithmetic sees
 a tie; Python sees 0.1299999999999999 and 0.13000000000000037, so the two

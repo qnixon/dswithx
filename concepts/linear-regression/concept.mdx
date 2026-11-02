@@ -76,8 +76,9 @@ in R, no `statistics.linear_regression` in Python, no `regr_slope` or
 `corr` in PostgreSQL, no backslash solve, `X \ y`, in Julia. The R, Python,
 and PostgreSQL tabs have a **Built-in** switch that shows those calls, and
 they print the same results. The from-scratch versions don't call a
-built-in mean either. They use everyday building blocks: arithmetic, a square root, and in most languages a built-in `sum`
-(PostgreSQL adds `count`).
+built-in mean either. They use everyday building blocks: arithmetic, a
+square root, and in most languages a built-in `sum` (PostgreSQL adds
+`count`, and C, which has no `sum`, writes every total as a loop).
 
 Watch for how each language makes the two passes the formulas need. The
 means come first, then the deviations from them. Watch how it pairs each

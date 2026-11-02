@@ -1,0 +1,4 @@
+language: c
+variant: from-scratch
+verification: automated
+verified_on: null

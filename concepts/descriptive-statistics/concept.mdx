@@ -67,9 +67,10 @@ but the names differ: `variance` in Python, `var` in R and Julia, and
 `var_samp` in PostgreSQL, which has no `median` either, only
 `percentile_cont(0.5)`.
 
-The from-scratch versions use everyday building blocks: arithmetic, a square root, sorting, and in most
-languages a built-in `sum`. PostgreSQL also uses SQL's basic `count`, `min`,
+The from-scratch versions use everyday building blocks: arithmetic, a
+square root, sorting, and in most languages a built-in `sum`. PostgreSQL also uses SQL's basic `count`, `min`,
 and `max` aggregates; the other languages read the minimum and maximum
 straight off the sorted values. Watch for how each one sorts (needed for the
-median), how it avoids integer-division traps when averaging, and how much
-ceremony it takes to print a number to six decimal places.
+median), how it avoids integer-division traps when averaging, how much
+ceremony it takes to print a number to six decimal places, and how C, with
+no array that grows, doubles its own with `realloc`.
