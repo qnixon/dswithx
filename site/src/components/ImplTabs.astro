@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import CodeBlock from './CodeBlock.astro';
 import VariantBadges from './VariantBadges.astro';
 import type { Implementation } from '../lib/repo';
+import { LANGUAGE_GROUPS } from '../site';
 
 interface Props {
   impls: Implementation[];
@@ -16,15 +17,32 @@ const panels = await Promise.all(
     Notes: impl.notes ? (await render(impl.notes)).Content : null,
   })),
 );
+
+// Tabs in labeled rows. Within a row, tabs keep the order of impls.
+const grouped = new Set(LANGUAGE_GROUPS.flatMap((g) => g.languages));
+const rows = [
+  ...LANGUAGE_GROUPS.map((g) => ({
+    label: g.label,
+    tabs: panels.filter((p) => g.languages.includes(p.impl.language.id)),
+  })),
+  { label: 'Other', tabs: panels.filter((p) => !grouped.has(p.impl.language.id)) },
+].filter((row) => row.tabs.length > 0);
 ---
 
 <div class="impl-tabs">
   <!-- Shown by the script below; without JavaScript every panel is listed in turn. -->
   <div class="tablist" role="tablist" aria-label="Implementations" hidden>
-    {panels.map(({ impl, label }) => (
-      <button type="button" role="tab" id={`tab-${impl.slug}`} aria-controls={impl.slug} data-slug={impl.slug}>
-        {label}
-      </button>
+    {rows.map((row) => (
+      <div class="tab-row" role="presentation">
+        <span class="row-label" aria-hidden="true">{row.label}</span>
+        <div class="row-tabs" role="presentation">
+          {row.tabs.map(({ impl, label }) => (
+            <button type="button" role="tab" id={`tab-${impl.slug}`} aria-controls={impl.slug} data-slug={impl.slug}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
     ))}
   </div>
 
@@ -97,28 +115,44 @@ const panels = await Promise.all(
 
 <style>
   .tablist {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.5rem 1rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
     margin-bottom: 1rem;
   }
+  /* Each row's label and buttons sit in the tablist's two columns. */
+  .tab-row { display: contents; }
+  .row-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding-top: 0.45rem;
+  }
+  .row-tabs { display: flex; flex-wrap: wrap; gap: 0.375rem; }
   [role='tab'] {
     font: inherit;
-    font-size: 0.95rem;
-    color: var(--muted);
-    background: none;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    padding: 0.5rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
     cursor: pointer;
   }
-  [role='tab']:hover { color: var(--text); }
+  [role='tab']:hover { border-color: var(--accent); }
   [role='tab'][aria-selected='true'] {
-    color: var(--text);
-    border-bottom-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: var(--accent);
     font-weight: 600;
+  }
+  /* On narrow screens each label sits above its buttons. */
+  @media (max-width: 600px) {
+    .tablist { grid-template-columns: 1fr; gap: 0.25rem; }
+    .row-label { padding-top: 0.5rem; }
   }
   .panel + .panel { margin-top: 2.5rem; }
   .enhanced .panel + .panel { margin-top: 0; }

@@ -7,6 +7,15 @@ export const LAUNCHED = true;
 // coverage grid, language index); the rest follow alphabetically.
 export const LANGUAGES_FIRST = ['python'];
 
+// Concept pages group the language tabs into these labeled rows, in this
+// order. A language missing from every group appears in a final "Other" row.
+export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
+  { label: 'Scripting', languages: ['python', 'javascript', 'ruby', 'awk'] },
+  { label: 'Arrays and math', languages: ['r', 'julia', 'apl', 'fortran'] },
+  { label: 'Systems', languages: ['go', 'rust'] },
+  { label: 'Business and databases', languages: ['cobol', 'postgresql'] },
+];
+
 // The home page names every language until there are more than this many;
 // after that it gives a count and names the HOME_HIGHLIGHTS that exist.
 export const HOME_LIST_LIMIT = 8;
