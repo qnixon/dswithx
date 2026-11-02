@@ -81,6 +81,7 @@ C, with no array that grows, doubles its own with `realloc`, while C++'s
 it from `0` instead of `0.0` and it adds whole numbers, quietly dropping
 every fraction. Common Lisp reads `28.6` as a single float, good to about 7
 digits, unless told otherwise, and Swift won't divide a `Double` by an `Int` until
-you convert it. Haskell, with no loops, gets every total from a fold such
+you convert it. Prolog's `sort` drops repeated values, so it sorts with
+`msort`. Haskell, with no loops, gets every total from a fold such
 as `sum`. Octave squares every
 deviation at once with `.^`, where the dot means "each element".

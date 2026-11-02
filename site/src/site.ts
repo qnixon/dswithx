@@ -13,7 +13,7 @@ export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
   { label: 'Scripting', languages: ['python', 'javascript', 'ruby', 'awk'] },
   { label: 'Arrays and math', languages: ['r', 'julia', 'octave', 'apl', 'fortran'] },
   { label: 'Systems', languages: ['c', 'cpp', 'go', 'rust', 'swift'] },
-  { label: 'Functional', languages: ['haskell', 'common-lisp'] },
+  { label: 'Functional and logic', languages: ['haskell', 'common-lisp', 'prolog'] },
   { label: 'Business and databases', languages: ['java', 'cobol', 'postgresql'] },
 ];
 
