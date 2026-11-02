@@ -70,11 +70,13 @@ standard deviation of 6 we put in.
 
 ## What to watch for across languages
 
-None of these implementations calls a ready-made regression or correlation
-function, even where the language has one: no `lm()` or `cor()` in R, no
-`statistics.linear_regression` in Python, no `regr_slope` or `corr` in
-PostgreSQL, no backslash solve, `X \ y`, in Julia. They don't call a built-in mean either. They do use everyday building blocks:
-arithmetic, a square root, and in most languages a built-in `sum`
+None of the from-scratch implementations calls a ready-made regression or
+correlation function, even where the language has one: no `lm()` or `cor()`
+in R, no `statistics.linear_regression` in Python, no `regr_slope` or
+`corr` in PostgreSQL, no backslash solve, `X \ y`, in Julia. The R, Python,
+and PostgreSQL tabs have a **Built-in** switch that shows those calls, and
+they print the same results. The from-scratch versions don't call a
+built-in mean either. They use everyday building blocks: arithmetic, a square root, and in most languages a built-in `sum`
 (PostgreSQL adds `count`).
 
 Watch for how each language makes the two passes the formulas need. The

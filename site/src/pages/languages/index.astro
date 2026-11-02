@@ -3,7 +3,8 @@ import Base from '../../layouts/Base.astro';
 import { getImplementations, getLanguages } from '../../lib/repo';
 
 const [languages, impls] = await Promise.all([getLanguages(), getImplementations()]);
-const count = (id: string) => impls.filter((i) => i.language.id === id).length;
+// Distinct concepts, so a built-in variant beside a from-scratch one counts once.
+const count = (id: string) => new Set(impls.filter((i) => i.language.id === id).map((i) => i.concept)).size;
 ---
 
 <Base title="Languages">

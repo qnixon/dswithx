@@ -73,13 +73,21 @@ match.
 
 ## What to watch for across languages
 
-None of these implementations calls a ready-made k-means, such as R's
-`kmeans()`. They use general tools: a distance formula (Python's
-`math.dist`, Go's `math.Hypot`, Fortran's `norm2`, written out by hand elsewhere), sums, counts, and picking the
-smallest value. Watch how each holds 2-D points: tuples, nested arrays, a
-matrix, structs in Go, fixed-size arrays in Rust, columns of a 2-D array in Fortran, separate x and y arrays in
-awk and PostgreSQL, or a table of records in COBOL. Watch how each notices
-that nothing changed: ten compare
-the whole assignment with the last one, while awk and COBOL set a flag as
+None of the from-scratch implementations calls a ready-made k-means. R has
+one, `kmeans()`, and the R tab's **Built-in** switch shows it. Its defaults
+aren't this page's method, though: it starts from random points and uses
+the Hartigan-Wong algorithm, which moves single points between clusters.
+Two runs with different seeds found inertias of 422.90 and 422.17, both a
+little lower than our 423.63. Passing the first three points and
+`algorithm = "Lloyd"` reproduces our result exactly.
+
+The from-scratch versions use general tools: a distance formula (Python's
+`math.dist`, Go's `math.Hypot`, Fortran's `norm2`, written out by hand
+elsewhere), sums, counts, and picking the smallest value. Watch how each
+holds 2-D points: tuples, nested arrays, a matrix, structs in Go,
+fixed-size arrays in Rust, columns of a 2-D array in Fortran, separate x
+and y arrays in awk and PostgreSQL, or a table of records in COBOL. Watch
+how each notices that nothing changed: ten compare the whole assignment
+with the last one, while awk and COBOL set a flag as
 they go. And watch PostgreSQL, which has no loop and repeats the two steps
 with `WITH RECURSIVE`.

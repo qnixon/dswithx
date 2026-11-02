@@ -66,12 +66,14 @@ leaning toward math and physics.
 
 ## What to watch for across languages
 
-None of these implementations calls a ready-made PCA or eigenvalue routine.
-Three languages have one: R's `prcomp()` and `eigen()`, Julia's `eigen`, and
-`Matrix#eigensystem` from Ruby's bundled `matrix` gem. All three find the
-same eigenvalues as power iteration, but R and Julia return the first
-component with every sign flipped, and Ruby flips the second. That's why
-the sign rule matters.
+None of the from-scratch implementations calls a ready-made PCA or
+eigenvalue routine. R and Julia have them, and their tabs have a
+**Built-in** switch that shows R's `prcomp()` and Julia's `eigen`. Both find
+the same eigenvalues as power iteration, but R returns the first component
+with every sign flipped, and Julia flips both. That's why the sign rule
+matters: with it, the built-ins print the same results. Ruby's
+`Matrix#eigensystem` would work too, but `matrix` is a bundled gem rather
+than part of the standard library, so it's left out.
 
 Watch how each holds a matrix. R, Julia, Fortran, and APL have matrices
 built in, so a power-iteration step is one product: `%*%`, `*`, `matmul`,

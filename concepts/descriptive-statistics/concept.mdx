@@ -59,9 +59,15 @@ days (72%) fall within one standard deviation of the mean.
 
 ## What to watch for across languages
 
-None of these implementations calls a ready-made mean, median, variance, or
-standard deviation function, even where the language has one. They do use
-everyday building blocks: arithmetic, a square root, sorting, and in most
+None of the from-scratch implementations calls a ready-made mean, median,
+variance, or standard deviation function, even where the language has one.
+Python, R, Julia, and PostgreSQL do have them, and their tabs have a
+**Built-in** switch that shows the short version. All four divide by n − 1,
+but the names differ: `variance` in Python, `var` in R and Julia, and
+`var_samp` in PostgreSQL, which has no `median` either, only
+`percentile_cont(0.5)`.
+
+The from-scratch versions use everyday building blocks: arithmetic, a square root, sorting, and in most
 languages a built-in `sum`. PostgreSQL also uses SQL's basic `count`, `min`,
 and `max` aggregates; the other languages read the minimum and maximum
 straight off the sorted values. Watch for how each one sorts (needed for the
