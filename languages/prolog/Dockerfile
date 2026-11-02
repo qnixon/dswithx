@@ -4,7 +4,15 @@
 # image is reproducible.
 FROM debian:trixie-20261027-slim
 
-RUN printf '%s\n' \
+# The x86 build of the package is a rebuild, numbered +b1; ARM's isn't.
+# Docker sets TARGETARCH, and each architecture keeps an exact pin.
+ARG TARGETARCH
+RUN case "$TARGETARCH" in \
+      amd64) version=9.2.9+dfsg-1+b1 ;; \
+      arm64) version=9.2.9+dfsg-1 ;; \
+      *) echo "no pinned version for $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+ && printf '%s\n' \
       'Types: deb' \
       'URIs: http://snapshot.debian.org/archive/debian/20261027T000000Z' \
       'Suites: trixie trixie-updates' \
@@ -12,7 +20,7 @@ RUN printf '%s\n' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
  && apt-get -o Acquire::Check-Valid-Until=false update \
- && apt-get install -y --no-install-recommends swi-prolog-core=9.2.9+dfsg-1 \
+ && apt-get install -y --no-install-recommends swi-prolog-core="$version" \
  && rm -rf /var/lib/apt/lists/*
 
 ENV HOME=/tmp
