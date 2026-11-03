@@ -84,7 +84,7 @@ to the true rule's 0.92.
 
 None of these implementations calls a ready-made tree. The usual one in R,
 `rpart()`, is a recommended package that this site's R image leaves out,
-and none of the other twenty-four languages ships one. They use general tools:
+and none of the other twenty-five languages ships one. They use general tools:
 sorting, counting, and arithmetic.
 
 Watch how each holds the tree, since a tree is the first data structure on
@@ -93,14 +93,14 @@ boxed, Swift an `indirect` enum that boxes them for you, Ruby uses two `Data` cl
 types and multiple dispatch, Haskell and OCaml use an algebraic data type that
 names itself with no boxes or pointers, Java
 uses a sealed interface and two records, Common Lisp uses a nested list
-shaped like its own code, Tcl a nested list such as `{leaf yes}`, Lua nested tables such as `{predict = "yes"}`, Prolog uses a plain term with one clause per kind
+shaped like its own code, Tcl a nested list such as `{leaf yes}`, Lua nested tables such as `{predict = "yes"}`, Elixir tagged tuples such as `{:leaf, "yes"}` with one function clause per shape, Prolog uses a plain term with one clause per kind
 of node, Go and C use a struct with `nil`
 or `NULL` children, Pascal a record whose children are pointers from `New`, C++ uses a struct whose `std::unique_ptr` children
 free themselves, Octave nests structs inside structs, and Python, R, and JavaScript use tuples, nested lists, or plain objects.
 Fortran keeps an array of node records, and awk, APL, and BASIC flatten the tree
 into parallel arrays, all in preorder.
 
-Watch, too, how each grows it. Twenty-two languages write `grow` as a function
+Watch, too, how each grows it. Twenty-three languages write `grow` as a function
 that calls itself on each side; Fortran has to mark it `recursive`, and OCaml
 writes `let rec`. COBOL
 and BASIC can't: a paragraph can perform itself, and a subroutine can `GOSUB` itself, but every level shares the same

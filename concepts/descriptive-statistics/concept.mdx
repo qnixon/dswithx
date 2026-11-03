@@ -90,5 +90,7 @@ insertion sort from `IF` and `GOTO`. Pascal's `Math` unit has a `Variance`
 that divides by n − 1, but its version adds the squares up in a loop.
 Haskell, with no loops, gets every total from a fold such
 as `sum`. OCaml never mixes integers and floats, so the mean divides with
-the float operator `/.` by `float_of_int n`. Octave squares every
+the float operator `/.` by `float_of_int n`. Elixir reads each value with `Float.parse`,
+because `String.to_float` stops with an error on a number with no decimal
+point, such as `12`. Octave squares every
 deviation at once with `.^`, where the dot means "each element".
