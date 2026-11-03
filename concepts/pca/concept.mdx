@@ -67,14 +67,14 @@ leaning toward math and physics.
 ## What to watch for across languages
 
 None of the from-scratch implementations calls a ready-made PCA or
-eigenvalue routine. R and Julia have them, and their tabs have a
-**Built-in** switch that shows R's `prcomp()` and Julia's `eigen`. Both find
-the same eigenvalues as power iteration, but R returns the first component
-with every sign flipped, and Julia flips both. That's why the sign rule
-matters: with it, the built-ins print the same results. Octave's `eig`
-would match too, once its eigenvalues, listed smallest first, are sorted.
-So would Ada's `Eigensystem`, from its standard library, which lists the
-largest first and flips the second component's signs. Ruby's
+eigenvalue routine. R, Julia, Octave, and Ada have them, and their tabs
+have a **Built-in** switch that shows R's `prcomp()`, Julia's `eigen`,
+Octave's `eig`, and Ada's `Eigensystem`. All four find the same
+eigenvalues as power iteration, but R returns the first component with
+every sign flipped, Julia flips both, and Ada flips the second. That's why
+the sign rule matters: with it, the built-ins print the same results.
+Octave's `eig` lists the eigenvalues smallest first, so it sorts them.
+Ruby's
 `Matrix#eigensystem` would work too, but `matrix` is a bundled gem rather
 than part of the standard library, so it's left out.
 

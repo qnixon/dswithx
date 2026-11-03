@@ -1,0 +1,4 @@
+language: ada
+variant: built-in
+verification: automated
+verified_on: null
