@@ -2,6 +2,7 @@
 import { Code } from 'astro:components';
 import { githubUrl } from '../site';
 import { basicGrammar } from '../lib/basic-grammar';
+import { ocamlGrammar } from '../lib/ocaml-grammar';
 
 interface Props {
   code: string;
@@ -11,8 +12,10 @@ interface Props {
 }
 
 const { code, filename, repoPath, lang = 'plaintext' } = Astro.props;
-// Languages Shiki doesn't bundle get a grammar defined in the site.
-const grammar = lang === 'basic' ? basicGrammar : lang;
+// Languages Shiki doesn't bundle, or bundles with a grammar the themes color
+// badly, get a grammar defined in the site.
+const grammars: Record<string, object> = { basic: basicGrammar, ocaml: ocamlGrammar };
+const grammar = grammars[lang] ?? lang;
 ---
 
 <figure class="code-block">

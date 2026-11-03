@@ -84,13 +84,13 @@ to the true rule's 0.92.
 
 None of these implementations calls a ready-made tree. The usual one in R,
 `rpart()`, is a recommended package that this site's R image leaves out,
-and none of the other twenty-three languages ships one. They use general tools:
+and none of the other twenty-four languages ships one. They use general tools:
 sorting, counting, and arithmetic.
 
 Watch how each holds the tree, since a tree is the first data structure on
 this site that contains itself. Rust uses an enum whose children must be
 boxed, Swift an `indirect` enum that boxes them for you, Ruby uses two `Data` classes and pattern matching, Julia uses two
-types and multiple dispatch, Haskell uses an algebraic data type that
+types and multiple dispatch, Haskell and OCaml use an algebraic data type that
 names itself with no boxes or pointers, Java
 uses a sealed interface and two records, Common Lisp uses a nested list
 shaped like its own code, Tcl a nested list such as `{leaf yes}`, Lua nested tables such as `{predict = "yes"}`, Prolog uses a plain term with one clause per kind
@@ -100,8 +100,9 @@ free themselves, Octave nests structs inside structs, and Python, R, and JavaScr
 Fortran keeps an array of node records, and awk, APL, and BASIC flatten the tree
 into parallel arrays, all in preorder.
 
-Watch, too, how each grows it. Twenty-one languages write `grow` as a function
-that calls itself on each side; Fortran has to mark it `recursive`. COBOL
+Watch, too, how each grows it. Twenty-two languages write `grow` as a function
+that calls itself on each side; Fortran has to mark it `recursive`, and OCaml
+writes `let rec`. COBOL
 and BASIC can't: a paragraph can perform itself, and a subroutine can `GOSUB` itself, but every level shares the same
 variables, so both keep an explicit stack of nodes. PostgreSQL grows the tree one level at a time with
 `WITH RECURSIVE`, with each row naming its node by a path such as `'LR'`.
