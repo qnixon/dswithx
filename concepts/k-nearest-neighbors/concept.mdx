@@ -68,21 +68,21 @@ general tools: arithmetic, square roots, Python's `math.dist`, Fortran's
 `table()`, and SQL's `count`. Go, Rust, C++, Java, JavaScript, Julia, Swift, Haskell, Common Lisp, and Prolog have
 no counter type, so they count votes in a map or a short list, Octave sums
 the yes-or-no list that `strcmp` returns, C compares
-labels with `strcmp` and counts them in a loop, BASIC does the same with a plain `=`, Fortran counts matching
+labels with `strcmp` and counts them in a loop, BASIC and Pascal do the same with a plain `=`, Fortran counts matching
 labels with `count`, and APL compares every neighbor with every label at
 once. awk and COBOL skip the square root and compare squared distances.
 
-Watch how each finds the 5 nearest. Seventeen of the twenty-one sort all 150
+Watch how each finds the 5 nearest. Eighteen of the twenty-two sort all 150
 distances for every test seed; awk, BASIC, COBOL, and Fortran pick the nearest
 unused seed five times over. Fortran's `minloc` returns the first of equal
 distances, and BASIC's strict `<` keeps the first it saw, which keeps the same order a stable sort would.
 
-Watch tie-breaking too. On an exactly equal distance, all twenty-one keep the
+Watch tie-breaking too. On an exactly equal distance, all twenty-two keep the
 earlier training row. Python's `sorted`, R's `order()`, Rust's `sort_by`, Java's `List.sort`, Swift's `sorted(by:)`, Prolog's `keysort`,
 JavaScript's, Julia's, and Octave's `sort`, Haskell's `sortOn`, and APL's `⍋` are
-stable. Go uses `slices.SortStableFunc`, because its plain `SortFunc` isn't guaranteed to be, and C++ and Common Lisp call `std::stable_sort` and `stable-sort` for the same reason. Ruby's `sort_by` and C's `qsort`
-aren't stable, so Ruby adds the file position to its sort key, and C's
-comparison function breaks ties by row number. But
+stable. Go uses `slices.SortStableFunc`, because its plain `SortFunc` isn't guaranteed to be, and C++ and Common Lisp call `std::stable_sort` and `stable-sort` for the same reason. Ruby's `sort_by`, C's `qsort`, and Pascal's `TArrayHelper.Sort`
+aren't stable, so Ruby adds the file position to its sort key, and C's and Pascal's
+comparison functions break ties by row number. But
 floating point decides what counts as equal. The test seed at 6.06 × 3.21
 has two training seeds exactly 0.13 mm away. COBOL's decimal arithmetic sees
 a tie; Python sees 0.1299999999999999 and 0.13000000000000037, so the two
