@@ -83,7 +83,8 @@ every fraction. Common Lisp reads `28.6` as a single float, good to about 7
 digits, unless told otherwise, and Swift won't divide a `Double` by an `Int` until
 you convert it. Prolog's `sort` drops repeated values, so it sorts with
 `msort`. In Tcl every value is a string, and a plain `lsort` compares
-text, putting 10 before 2, so it sorts with `lsort -real`. Lua's `/`
+text, putting 10 before 2, so it sorts with `lsort -real`. Perl's plain
+`sort` compares text too, so it sorts with `sort { $a <=> $b }`. Lua's `/`
 always gives a float, so its mean can't lose a fraction, and the median
 finds its middle with `//`, which rounds down. BASIC fixes each array's size up front with `DIM` and builds its
 insertion sort from `IF` and `GOTO`. Pascal's `Math` unit has a `Variance`

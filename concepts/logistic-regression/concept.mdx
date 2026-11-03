@@ -78,14 +78,14 @@ pin down.
 ## What to watch for across languages
 
 None of these implementations calls a ready-made logistic regression. Of the
-twenty-seven languages, only R ships one, `glm(..., family = binomial)`, which finds
+twenty-eight languages, only R ships one, `glm(..., family = binomial)`, which finds
 the same weights to six decimals in five steps of a cleverer method. The
 rest use general tools: `exp`, `log`, square roots, sums, and loops.
 
 Watch how each takes one step. R, Julia, Octave, Fortran, and APL do it
 with matrix products (`%*%`, `*` in Julia and Octave, `matmul`, and `+.×`),
 with no loop over students. In Octave, the dot in the sigmoid's `./` matters:
-with a plain `/`, the first step quietly builds a 150 by 150 matrix. Python, Ruby, JavaScript, Swift, Haskell, OCaml, Elixir, Common Lisp, Prolog, and Tcl build each new list of
+with a plain `/`, the first step quietly builds a 150 by 150 matrix. Python, Ruby, JavaScript, Swift, Haskell, OCaml, Elixir, Common Lisp, Prolog, Tcl, and Perl build each new list of
 weights from the old one, and Rust sums
 the gradient with iterator chains. awk, BASIC, COBOL, Go, C, C++, Java, Pascal, Lua, and Ada add it up
 in an explicit loop, and PostgreSQL, which has no loops at all, makes each step

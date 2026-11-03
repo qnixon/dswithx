@@ -10,7 +10,7 @@ export const LANGUAGES_FIRST = ['python'];
 // Concept pages group the language tabs into these labeled rows, in this
 // order. A language missing from every group appears in a final "Other" row.
 export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
-  { label: 'Scripting', languages: ['python', 'javascript', 'ruby', 'lua', 'awk', 'tcl'] },
+  { label: 'Scripting', languages: ['python', 'javascript', 'ruby', 'lua', 'perl', 'awk', 'tcl'] },
   { label: 'Arrays and math', languages: ['r', 'julia', 'octave', 'apl', 'fortran'] },
   { label: 'Systems', languages: ['c', 'cpp', 'go', 'rust', 'swift', 'ada'] },
   { label: 'Functional and logic', languages: ['haskell', 'ocaml', 'elixir', 'common-lisp', 'prolog'] },
