@@ -92,5 +92,6 @@ Haskell, with no loops, gets every total from a fold such
 as `sum`. OCaml never mixes integers and floats, so the mean divides with
 the float operator `/.` by `float_of_int n`. Elixir reads each value with `Float.parse`,
 because `String.to_float` stops with an error on a number with no decimal
-point, such as `12`. Octave squares every
+point, such as `12`. Ada's `Long_Float'Image` prints in E notation,
+such as ` 2.96775000000000E+01`, so it prints with `Put` and `Exp => 0`. Octave squares every
 deviation at once with `.^`, where the dot means "each element".

@@ -72,13 +72,16 @@ eigenvalue routine. R and Julia have them, and their tabs have a
 the same eigenvalues as power iteration, but R returns the first component
 with every sign flipped, and Julia flips both. That's why the sign rule
 matters: with it, the built-ins print the same results. Octave's `eig`
-would match too, once its eigenvalues, listed smallest first, are sorted. Ruby's
+would match too, once its eigenvalues, listed smallest first, are sorted.
+So would Ada's `Eigensystem`, from its standard library, which lists the
+largest first and flips the second component's signs. Ruby's
 `Matrix#eigensystem` would work too, but `matrix` is a bundled gem rather
 than part of the standard library, so it's left out.
 
 Watch how each holds a matrix. R, Julia, Octave, Fortran, and APL have
-matrices built in, so a power-iteration step is one product: `%*%`, `*` in
-Julia and Octave, `matmul`, or `+.×`. APL also needs no loop, since `⍣` repeats the step 1,000 times,
+matrices built in, and Ada has them in its standard library, so a
+power-iteration step is one product: `%*%`, `*` in Julia, Octave, and Ada,
+`matmul`, or `+.×`. APL also needs no loop, since `⍣` repeats the step 1,000 times,
 and neither does Haskell, whose `iterate` builds the endless list of steps.
 Python, Ruby, Java, JavaScript, Swift, Haskell, OCaml, Elixir, Common Lisp, Prolog, Tcl, and Lua use arrays or lists of rows with
 small helper functions, and Go, Rust, C, C++, and Pascal use fixed-size arrays whose length is part of the type. BASIC uses 2-D arrays sized by `DIM`, with a loop for every product. COBOL nests one

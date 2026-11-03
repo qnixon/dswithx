@@ -12,7 +12,7 @@ export const LANGUAGES_FIRST = ['python'];
 export const LANGUAGE_GROUPS: { label: string; languages: string[] }[] = [
   { label: 'Scripting', languages: ['python', 'javascript', 'ruby', 'lua', 'awk', 'tcl'] },
   { label: 'Arrays and math', languages: ['r', 'julia', 'octave', 'apl', 'fortran'] },
-  { label: 'Systems', languages: ['c', 'cpp', 'go', 'rust', 'swift'] },
+  { label: 'Systems', languages: ['c', 'cpp', 'go', 'rust', 'swift', 'ada'] },
   { label: 'Functional and logic', languages: ['haskell', 'ocaml', 'elixir', 'common-lisp', 'prolog'] },
   { label: 'Teaching', languages: ['basic', 'pascal'] },
   { label: 'Business and databases', languages: ['java', 'cobol', 'postgresql'] },

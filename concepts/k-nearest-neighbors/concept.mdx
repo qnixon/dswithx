@@ -68,20 +68,20 @@ general tools: arithmetic, square roots, Python's `math.dist`, Fortran's
 `table()`, Elixir's `Enum.frequencies`, and SQL's `count`. Go, Rust, C++, Java, JavaScript, Julia, Swift, Haskell, Common Lisp, OCaml, Prolog, Tcl, and Lua have
 no counter type, so they count votes in a map or a short list, Octave sums
 the yes-or-no list that `strcmp` returns, C compares
-labels with `strcmp` and counts them in a loop, BASIC and Pascal do the same with a plain `=`, Fortran counts matching
+labels with `strcmp` and counts them in a loop, BASIC, Pascal, and Ada do the same with a plain `=`, Fortran counts matching
 labels with `count`, and APL compares every neighbor with every label at
 once. awk and COBOL skip the square root and compare squared distances.
 
-Watch how each finds the 5 nearest. Twenty-two of the twenty-six sort all 150
+Watch how each finds the 5 nearest. Twenty-three of the twenty-seven sort all 150
 distances for every test seed; awk, BASIC, COBOL, and Fortran pick the nearest
 unused seed five times over. Fortran's `minloc` returns the first of equal
 distances, and BASIC's strict `<` keeps the first it saw, which keeps the same order a stable sort would.
 
-Watch tie-breaking too. On an exactly equal distance, all twenty-six keep the
+Watch tie-breaking too. On an exactly equal distance, all twenty-seven keep the
 earlier training row. Python's `sorted`, R's `order()`, Rust's `sort_by`, Java's `List.sort`, Swift's `sorted(by:)`, Prolog's `keysort`, Tcl's `lsort`,
 JavaScript's, Julia's, and Octave's `sort`, Haskell's `sortOn`, Elixir's `Enum.sort_by`, and APL's `⍋` are
-stable. Go uses `slices.SortStableFunc`, because its plain `SortFunc` isn't guaranteed to be, and C++, Common Lisp, and OCaml call `std::stable_sort`, `stable-sort`, and `List.stable_sort` for the same reason. Ruby's `sort_by`, C's `qsort`, Pascal's `TArrayHelper.Sort`, and Lua's `table.sort`
-aren't stable, so Ruby adds the file position to its sort key, and C's, Pascal's, and Lua's
+stable. Go uses `slices.SortStableFunc`, because its plain `SortFunc` isn't guaranteed to be, and C++, Common Lisp, and OCaml call `std::stable_sort`, `stable-sort`, and `List.stable_sort` for the same reason. Ruby's `sort_by`, C's `qsort`, Pascal's `TArrayHelper.Sort`, Lua's `table.sort`, and Ada's `Generic_Array_Sort`
+aren't stable, so Ruby adds the file position to its sort key, and C's, Pascal's, Lua's, and Ada's
 comparison functions break ties by row number. But
 floating point decides what counts as equal. The test seed at 6.06 × 3.21
 has two training seeds exactly 0.13 mm away. COBOL's decimal arithmetic sees
