@@ -86,7 +86,8 @@ you convert it. Prolog's `sort` drops repeated values, so it sorts with
 text, putting 10 before 2, so it sorts with `lsort -real`. Perl's plain
 `sort` compares text too, so it sorts with `sort { $a <=> $b }`. Lua's `/`
 always gives a float, so its mean can't lose a fraction, and the median
-finds its middle with `//`, which rounds down. BASIC fixes each array's size up front with `DIM` and builds its
+finds its middle with `//`, which rounds down. PHP's `/` gives a whole
+number only when the division comes out even, so its median uses `intdiv`. BASIC fixes each array's size up front with `DIM` and builds its
 insertion sort from `IF` and `GOTO`. Pascal's `Math` unit has a `Variance`
 that divides by n − 1, but its version adds the squares up in a loop.
 Haskell, with no loops, gets every total from a fold such
