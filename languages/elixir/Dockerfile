@@ -11,6 +11,7 @@ RUN printf '%s\n' \
       'Components: main' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
+ && printf 'Acquire::Retries "5";\n' > /etc/apt/apt.conf.d/80-retries \
  && apt-get -o Acquire::Check-Valid-Until=false update \
  && apt-get install -y --no-install-recommends elixir=1.18.3.dfsg-1 erlang-base=1:27.3.4.1+dfsg-1+deb13u3 \
  && rm -rf /var/lib/apt/lists/*

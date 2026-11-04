@@ -1,6 +1,7 @@
 """Run every implementation in its container and compare against expected.txt.
 
     python3 harness/run_tests.py [--concept NAME] [--language NAME] [--timeout SECONDS]
+                                [--skip-build]
 
 Exits non-zero if any implementation fails, times out, errors, or breaks the
 repository's structure rules.
@@ -10,7 +11,8 @@ import argparse
 import sys
 
 from common import (
-    HarnessError, build_image, compare, discover, format_rows, parse_lines, run_impl,
+    HarnessError, build_image, compare, discover, format_rows, image_exists, parse_lines,
+    run_impl,
 )
 
 
@@ -23,6 +25,8 @@ def main():
     parser.add_argument("--concept", help="only this concept (folder name)")
     parser.add_argument("--language", help="only this language (meta.yaml language)")
     parser.add_argument("--timeout", type=float, default=60, help="seconds per run (default 60)")
+    parser.add_argument("--skip-build", action="store_true",
+                        help="use existing images instead of building (CI restores them from cache)")
     args = parser.parse_args()
 
     impls = discover(args.concept, args.language)
@@ -34,10 +38,14 @@ def main():
     languages = sorted({i.language for i in impls if not i.problems and not i.manual})
     build_errors = {}
     for lang in languages:
+        if args.skip_build:
+            if not image_exists(lang):
+                build_errors[lang] = f"no dswithx/{lang} image to use with --skip-build"
+            continue
         print(f"building dswithx/{lang} ...", file=sys.stderr, flush=True)
         ok, log = build_image(lang)
         if not ok:
-            build_errors[lang] = log
+            build_errors[lang] = "image build failed:\n" + log[-2000:]
 
     counts = {"pass": 0, "fail": 0, "skip": 0}
     for impl in impls:
@@ -58,7 +66,7 @@ def check(impl, build_errors, timeout):
     if impl.manual:
         return "SKIP", indent(f"manually verified on {impl.meta['verified_on']}")
     if impl.language in build_errors:
-        return "ERROR", indent("image build failed:\n" + build_errors[impl.language][-2000:])
+        return "ERROR", indent(build_errors[impl.language])
 
     expected_path = impl.concept_dir / "expected.txt"
     if not expected_path.is_file():

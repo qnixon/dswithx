@@ -10,6 +10,7 @@ RUN printf '%s\n' \
       'Components: main' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
+ && printf 'Acquire::Retries "5";\n' > /etc/apt/apt.conf.d/80-retries \
  && apt-get -o Acquire::Check-Valid-Until=false update \
  && apt-get install -y --no-install-recommends gcc-14=14.2.0-19 libc6-dev=2.41-12+deb13u4 \
  && rm -rf /var/lib/apt/lists/*

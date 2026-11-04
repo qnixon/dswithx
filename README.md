@@ -93,6 +93,9 @@ GitHub Actions runs two workflows:
   the languages a change affects (`harness/ci_plan.py` decides), one matrix job
   per language, and builds the site. On `main` it tests every language and,
   only if all pass, deploys `site/dist` to Cloudflare with `wrangler deploy`.
+  Each language image is kept in the Actions cache, keyed on a hash of
+  `languages/<lang>/`, and rebuilt only when that folder changes; on a cache
+  hit the harness runs with `--skip-build`.
 - **Full test** (`.github/workflows/full-test.yml`), weekly and on demand.
   Tests everything, to catch drift no commit caused.
 

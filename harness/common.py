@@ -151,13 +151,38 @@ def discover(concept=None, language=None):
 
 
 def build_image(language):
-    """Build dswithx/<language>; Docker's layer cache makes rebuilds cheap."""
+    """Build dswithx/<language>; Docker's layer cache makes rebuilds cheap.
+
+    On failure, the log ends with apt's own error lines (such as a download
+    that failed), which Docker's summary leaves out.
+    """
     proc = subprocess.run(
-        ["docker", "build", "--quiet", "--tag", f"dswithx/{language}", str(LANGUAGES / language)],
+        ["docker", "build", "--progress=plain", "--tag", f"dswithx/{language}",
+         str(LANGUAGES / language)],
         capture_output=True,
         text=True,
     )
-    return proc.returncode == 0, proc.stderr + proc.stdout
+    log = proc.stderr + proc.stdout
+    if proc.returncode == 0:
+        return True, log
+    # Docker prefixes each line with a step number and time ("#6 1.843 ")
+    # and repeats the failing step's output in its summary; drop both.
+    apt_lines = []
+    for line in log.splitlines():
+        line = re.sub(r"^(#\d+ )?[\d.]+ ", "", line)
+        if re.search(r"\b(E|Err|W):", line) and line not in apt_lines:
+            apt_lines.append(line)
+    summary = log[-1200:]
+    if apt_lines:
+        summary += "\napt reported:\n" + "\n".join(apt_lines[-8:])
+    return False, summary
+
+
+def image_exists(language):
+    proc = subprocess.run(
+        ["docker", "image", "inspect", f"dswithx/{language}"], capture_output=True
+    )
+    return proc.returncode == 0
 
 
 @dataclass

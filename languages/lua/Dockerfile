@@ -11,6 +11,7 @@ RUN printf '%s\n' \
       'Components: main' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
+ && printf 'Acquire::Retries "5";\n' > /etc/apt/apt.conf.d/80-retries \
  && apt-get -o Acquire::Check-Valid-Until=false update \
  && apt-get install -y --no-install-recommends lua5.4=5.4.7-1+b2 liblua5.4-0=5.4.7-1+b2 \
  && rm -rf /var/lib/apt/lists/*

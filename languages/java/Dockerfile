@@ -11,6 +11,7 @@ RUN printf '%s\n' \
       'Components: main' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
+ && printf 'Acquire::Retries "5";\n' > /etc/apt/apt.conf.d/80-retries \
  && apt-get -o Acquire::Check-Valid-Until=false update \
  && mkdir -p /usr/share/man/man1 \
  && apt-get install -y --no-install-recommends openjdk-21-jdk-headless=21.0.12.1+1-1~deb13u1 \

@@ -11,6 +11,7 @@ RUN printf '%s\n' \
       'Components: main' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
+ && printf 'Acquire::Retries "5";\n' > /etc/apt/apt.conf.d/80-retries \
  && apt-get -o Acquire::Check-Valid-Until=false update \
  && apt-get install -y --no-install-recommends perl=5.40.1-6+deb13u1 perl-modules-5.40=5.40.1-6+deb13u1 libperl5.40=5.40.1-6+deb13u1 \
  && rm -rf /var/lib/apt/lists/*

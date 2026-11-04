@@ -50,7 +50,37 @@ jobs:
     name: test (${{ matrix.language }})
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - run: python3 harness/run_tests.py --language ${{ matrix.language }}
+      # Building an image downloads its toolchain from snapshot.debian.org or
+      # Docker Hub, and both turn requests away when busy. So each image is
+      # cached under a hash of languages/<lang>/, everything that goes into
+      # it, and rebuilt only when that folder changes. The weekly full test
+      # still builds from scratch.
+      - id: image
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/image.tar
+          key: image-${{ matrix.language }}-${{ hashFiles(format('languages/{0}/**', matrix.language)) }}
+      - if: steps.image.outputs.cache-hit == 'true'
+        run: docker load --input "$RUNNER_TEMP/image.tar"
+      - run: >-
+          python3 harness/run_tests.py --language ${{ matrix.language }}
+          ${{ steps.image.outputs.cache-hit == 'true' && '--skip-build' || '' }}
+      # Save a freshly built image even if a test failed, so fixing the code
+      # doesn't mean downloading the toolchain again.
+      - id: save
+        if: always() && steps.image.outputs.cache-hit != 'true'
+        env:
+          IMAGE: dswithx/${{ matrix.language }}
+        run: |
+          if docker image inspect "$IMAGE" > /dev/null 2>&1; then
+            docker save --output "$RUNNER_TEMP/image.tar" "$IMAGE"
+            echo "saved=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: always() && steps.save.outputs.saved == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/image.tar
+          key: ${{ steps.image.outputs.cache-primary-key }}
 
   build:
     runs-on: ubuntu-24.04

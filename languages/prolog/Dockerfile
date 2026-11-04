@@ -19,6 +19,7 @@ RUN case "$TARGETARCH" in \
       'Components: main' \
       'Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg' \
       > /etc/apt/sources.list.d/debian.sources \
+ && printf 'Acquire::Retries "5";\n' > /etc/apt/apt.conf.d/80-retries \
  && apt-get -o Acquire::Check-Valid-Until=false update \
  && apt-get install -y --no-install-recommends swi-prolog-core="$version" \
  && rm -rf /var/lib/apt/lists/*
