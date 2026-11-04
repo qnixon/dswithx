@@ -1,0 +1,4 @@
+title: Evaluation metrics
+summary: Measure a classifier by the mistakes it makes, not just how often it's right.
+order: 11
+difficulty: intermediate
