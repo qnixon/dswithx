@@ -1,0 +1,4 @@
+language: apl
+variant: from-scratch
+verification: automated
+verified_on: null

@@ -1,0 +1,13 @@
+train_count 150
+test_count 50
+cv_accuracy_k1 0.893333
+cv_accuracy_k3 0.920000
+cv_accuracy_k5 0.940000
+cv_accuracy_k7 0.946667
+cv_accuracy_k9 0.933333
+cv_accuracy_k11 0.926667
+cv_accuracy_k13 0.920000
+cv_accuracy_k15 0.926667
+best_k 7
+test_correct 47
+test_accuracy 0.940000

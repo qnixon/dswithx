@@ -1,0 +1,92 @@
+Every model on this site has settings you choose before it learns anything:
+$k$ in k-nearest neighbors, the depth of a decision tree, the learning rate in
+logistic regression. Cross-validation is how you choose them honestly. It
+holds back part of the training data, tests the model there, and repeats
+until every part has had its turn.
+
+## The dataset
+
+`data.csv` is the k-nearest neighbors data, unchanged: 200 synthetic wheat
+seeds, kama or rosa, with kernel `length_mm` and `width_mm`. The `split`
+column marks 150 as `train` and 50 as `test`. The kNN page fixed $k = 5$ and
+got 47 of the 50 test seeds right. Here we ask which $k$ we should have used.
+
+## Why not just use the test seeds?
+
+Try every $k$ on the test seeds and you'd pick $k = 3$, which gets 48 of
+50 right. But the test seeds exist to estimate how the model does on seeds
+it has never seen. Once they've chosen $k$, they've been seen, and 48 of 50
+is flattering, not honest.
+
+## The method
+
+1. **Split** the 150 training seeds into 5 folds of 30. The rows are
+   already shuffled, so fold 1 is rows 1 to 30, fold 2 rows 31 to 60, and
+   so on.
+2. **For each odd** $k$ from 1 to 15 (odd, so a two-way vote can't tie),
+   hold out each fold in turn, classify its 30 seeds using the other 120, and count the correct
+   ones. Every training seed is held out exactly once, so the
+   cross-validated accuracy is
+   $$
+   \text{CV}(k) = \frac{\text{correct across all 5 folds}}{150}
+   $$
+3. **Pick** the $k$ with the highest CV accuracy. On a tie, the smaller $k$
+   wins.
+4. **Test once.** Classify the 50 test seeds using all 150 training seeds
+   and the chosen $k$, and report that score.
+
+## Reading the results
+
+| $k$ | Correct per fold | CV accuracy |
+| --- | --- | --- |
+| 1 | 27, 28, 27, 27, 25 | 0.893 |
+| 3 | 28, 29, 28, 27, 26 | 0.920 |
+| 5 | 28, 29, 29, 28, 27 | 0.940 |
+| 7 | 28, 29, 29, 28, 28 | 0.947 |
+| 9 | 28, 29, 27, 28, 28 | 0.933 |
+| 11 | 28, 28, 28, 28, 27 | 0.927 |
+| 13 | 28, 28, 27, 28, 27 | 0.920 |
+| 15 | 28, 28, 28, 28, 27 | 0.927 |
+
+Cross-validation picks $k = 7$, at 142 of 150, and it gets 47 of the 50
+test seeds right: the same 0.94 as the kNN page's $k = 5$, but now a number
+we can trust.
+
+Read across a row and you'll see why one held-out set isn't enough. With
+$k = 1$, the folds score anywhere from 25 to 28 out of 30. And if you'd
+used a single fold to choose, you'd have picked $k = 3$ with fold 1 or 2,
+$k = 5$ with fold 3 or 4, and $k = 7$ only with fold 5. Averaging over all
+five folds smooths out that luck.
+
+The extremes lose for opposite reasons: with $k = 1$, one oddly placed
+seed misleads its neighbors, and with large $k$, the vote reaches into the
+other variety's territory.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made cross-validation routine;
+scikit-learn, R's caret, and Julia's MLJ have them, but aren't installed.
+Each language reuses its kNN classifier, so the interest is in how it
+carves out a fold.
+
+Watch what the second number in a slice means. Python's `train[30:60]`
+stops before row 60, Tcl's `lrange` and Julia's `31:60` include both ends,
+and PHP's `array_slice` takes a length instead of an end. Mix them up and a
+fold comes out one row short or one row long.
+
+Watch for views, too. Go's `train[a:b]`, Java's `subList`, and C++'s
+`std::span` look at the original rows without copying them. That's cheap,
+but in Go the obvious
+`append(train[:a], train[b:]...)` writes the later folds over the fold
+being tested, and cross-validation reports 100% accuracy for $k = 1$. Go
+copies with `slices.Concat` instead.
+
+Some languages never cut at all. R drops the fold with a negative index,
+`train[-rows, ]`. Octave and APL keep rows with a true-or-false mask. awk,
+BASIC, and COBOL skip the held-out rows inside the neighbor search, and
+PostgreSQL gives every row a fold number and joins on `fold <> held.fold`.
+
+And watch the tie rule for the best $k$. Haskell's `maximumBy` returns the
+last of equal values, so most languages compare with a strict `>`, which
+keeps the smaller $k$. APL's `⍳` and PostgreSQL's
+`ORDER BY accuracy DESC, k` get the same answer by taking the first.

@@ -1,0 +1,4 @@
+title: Cross-validation
+summary: Choose a model's settings by testing it on every part of the training data in turn.
+order: 9
+difficulty: intermediate
