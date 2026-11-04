@@ -1,0 +1,4 @@
+title: Train and test sets
+summary: See why a model is judged on data it never saw, as polynomials of rising degree overfit.
+order: 12
+difficulty: intermediate

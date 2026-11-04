@@ -1,0 +1,105 @@
+A model that fits its training data perfectly can still be useless. It
+may have learned the noise in those particular points rather than the
+pattern behind them, and the only way to find out is to test it on data
+it never saw. That's why several pages on this site hold back a test set.
+This page shows what goes wrong without one.
+
+## The dataset
+
+`data.csv` holds 36 drives of one car, each at a steady `speed` in km/h,
+with its fuel use in `litres` per 100 km. The data is synthetic, and we
+know the truth: fuel use follows a gentle U, lowest near 65 km/h, plus
+noise. The `split` column marks 12 drives as `train` and 24 as `test`.
+We kept the training set small on purpose, because that's when
+overfitting is easiest to see.
+
+## The method
+
+We fit a polynomial of each degree from 1 to 8 to the training drives
+alone. A degree-$d$ polynomial has $d + 1$ coefficients:
+
+$$
+\hat{y} = c_0 + c_1 z + c_2 z^2 + \cdots + c_d z^d
+$$
+
+Here $z$ is the speed mapped onto −1 to 1, using the training range of 36
+to 116 km/h. Without that step, degree 8 would add up raw speeds to the
+16th power, around $10^{33}$, next to small numbers, and the arithmetic
+would lose accuracy.
+
+**Least squares** picks the coefficients that make the squared errors on
+the training drives as small as possible. Setting the slope of that error
+to zero gives $d + 1$ linear equations in $d + 1$ unknowns, the **normal
+equations**, and each implementation solves them by **Gaussian
+elimination**: subtract multiples of each row from the rows below until
+the system is triangular, then solve from the bottom up.
+
+Then we measure each fit by its root-mean-square error, in litres per
+100 km, once on the training drives and once on the test drives:
+
+$$
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (\hat{y}_i - y_i)^2}
+$$
+
+## Reading the results
+
+| Degree | Train RMSE | Test RMSE |
+| --- | --- | --- |
+| 1 | 0.529 | 0.779 |
+| 2 | 0.284 | 0.391 |
+| 3 | 0.278 | 0.405 |
+| 4 | 0.272 | 0.390 |
+| 5 | 0.220 | 0.546 |
+| 6 | 0.186 | 0.630 |
+| 7 | 0.149 | 0.549 |
+| 8 | 0.074 | 1.153 |
+
+The training error falls at every step. Each extra coefficient gives the
+curve one more way to bend toward the 12 points, so it can only fit them
+better. By degree 8, it nearly runs through every one.
+
+The test error tells the real story. A straight line is too stiff to
+follow the U. Degree 2, the true shape, cuts the test error in half.
+Degrees 3 and 4 barely change it. From degree 5, the test error rises,
+reaching 1.153 at degree 8, the worst of all.
+
+Look at where the training speeds fall: five between 36 and 54 km/h,
+five between 101 and 116, and only two, 71 and 81, in between. In that
+gap, the degree-8 curve is free to wiggle. At 70 km/h it predicts 3.90
+litres, and at 90 it predicts 6.51, when the truth is 4.52 and 5.06.
+Four test drives also sit just outside the training range, where every
+polynomial has to extrapolate. But even the 20 test drives inside the
+range give degree 8 an error of 0.80, against 0.33 for degree 2.
+
+Degrees 2 and 4 nearly tie on the test set. When they do, choose the
+simpler one: it has fewer ways to be wrong on data you haven't seen yet.
+
+## What to watch for across languages
+
+None of these implementations calls a fitter or a solver, though several
+languages ship one: Octave's `polyfit` and backslash, Julia's `\`, APL's
+`⌹`, Ada's `Solve`, and R's `lm()`. NumPy's `polyfit` would do it in
+Python, but NumPy isn't installed. Each implementation writes out the
+elimination instead, and three things vary.
+
+The first is scaling. In Julia, solving the normal equations on raw
+speeds with the built-in `\` gives a degree-8 training error of 0.073996
+instead of 0.073821, a difference big enough to fail this site's tests.
+R's `lm()` gets the right answer even from raw speeds, because it avoids
+the normal equations and uses a more stable method, a QR decomposition.
+
+The second is how a row swap works. Where a matrix is a list of rows, as
+in Python, Go, Java, Lua, and OCaml, swapping trades two references and
+copies no numbers. C can't assign one array row to another, so it swaps
+entry by entry, as do Common Lisp and Pascal with their 2-D arrays.
+Octave, Julia, R, and APL swap two rows in one assignment by indexing
+both at once. In Swift, Tcl, and PHP, arrays are values, so `solve`
+works on its own copy and the caller's equations stay untouched.
+
+The third is the small traps along the way. APL reads `K-1↓⍳N` as
+`K-(1↓⍳N)`, since it evaluates right to left. In PostgreSQL, `m[2]` on a
+2-D array gives NULL, not row 2; you need `m[2:2]`. SWI-Prolog's `/`
+returns an integer when it divides exactly, so the code converts each
+scaled speed to a float. And COBOL works in fixed-point decimals, with 18
+digits after the point, and still matches double precision to within
+1e-11.
