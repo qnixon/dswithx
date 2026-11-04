@@ -1,0 +1,8 @@
+control_count 8
+compost_count 8
+control_mean 403.875000
+compost_mean 453.625000
+observed_difference 49.750000
+splits 12870
+as_extreme 398
+p_value 0.030925

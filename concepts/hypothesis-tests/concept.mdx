@@ -1,0 +1,102 @@
+You grow 8 tomato plants with compost and 8 without, and the compost plants
+yield more. But plants vary, so some gap would show up even if compost did
+nothing. A hypothesis test asks how surprising your gap would be if chance
+were the only thing at work.
+
+## The dataset
+
+`data.csv` holds the yield of 16 plants in whole grams, with a `group`
+column of `control` or `compost`. The data is synthetic, and we know the
+truth: `make_data.py` gives compost plants an extra 50 g on average. The
+control plants average 403.875 g and the compost plants 453.625 g, a gap
+of 49.75 g.
+
+## The question, turned around
+
+The test starts by assuming the dull explanation, called the **null
+hypothesis**: compost makes no difference. If that's true, the labels are
+arbitrary. Each plant would have yielded the same whatever group it was
+in, so any 8 of the 16 could just as well have been the compost group.
+
+That gives us a way to see what chance alone produces. Choose 8 plants,
+call them compost, and compute the gap. There are exactly
+
+$$
+\binom{16}{8} = 12{,}870
+$$
+
+ways to choose them, few enough to try every one. That's what makes this
+an **exact permutation test**: no random shuffling and no table of a
+probability distribution, just counting.
+
+## The method
+
+1. **Observe** the real gap: compost total minus control total.
+2. **Relabel** every possible way, 12,870 in all, and compute each gap the
+   same way.
+3. **Count** the relabelings whose gap is at least as large as the real
+   one, in either direction. Counting both directions makes the test
+   **two-sided**: we'd be just as surprised if compost cut the yield.
+4. **Divide** by 12,870. That fraction is the **p-value**.
+
+Both groups have 8 plants, so comparing totals is the same as comparing
+means. Totals are whole numbers, though, so every language compares them
+exactly. That matters: 6 relabelings give a gap of exactly 49.75 g, and
+they must all count as "at least as large".
+
+## Reading the result
+
+398 of the 12,870 relabelings give a gap of 49.75 g or more, so
+
+$$
+p = \frac{398}{12{,}870} \approx 0.031
+$$
+
+If compost did nothing, a gap this large would turn up about 3% of the
+time. By the common convention of rejecting the null hypothesis when $p$
+is below 0.05, we'd conclude compost helps.
+
+Two cautions. First, $p$ is not the chance that compost does nothing. It's
+the chance of a gap this large *if* compost does nothing.
+
+Second, small samples swing. We drew 20 datasets from the same recipe,
+each with the same true 50 g effect, and chose this one as a clear
+example. Their p-values ran from 0.0002 to 0.77, and only 8 of the 20 fell
+below 0.05. A large p-value means the data can't rule chance out, not that
+the effect is absent. With 8 plants a group, a real 50 g effect is easy to
+miss.
+
+## What to watch for across languages
+
+None of these implementations calls a ready-made test. SciPy's
+`permutation_test`, R's coin package, and Apache Commons Math have them,
+but they aren't installed. The interest is in how each language lists the
+12,870 splits.
+
+Some hand you the list. Python's `itertools.combinations`, Ruby's
+`combination`, R's `combn`, and Octave's `nchoosek` give every choice of 8
+plants in one call. Haskell's `subsequences` and Prolog's `subseq` come
+close, but they list all 65,536 subsets, and you still have to keep the
+ones of size 8.
+
+Others count in binary. Each number from 0 to 65,535 is a 16-bit mask of
+which plants are chosen, and you keep the masks with exactly eight 1s:
+Java's `Integer.bitCount`, Julia's `count_ones`, and Common Lisp's
+`logcount` count them for you. C++ goes the other way, with
+`std::next_permutation` stepping through the arrangements of eight 0s and
+eight 1s. APL builds the whole 16 by 65,536 table of masks at once.
+
+The rest write the recursion out, taking or skipping one plant at a time,
+and that's where the traps are. In awk, a function's only local variables
+are extra parameters. Leave the loop counter out of the list, and every
+call shares one counter: the program reports 9 splits instead of 12,870.
+In Go, a closure declared with `:=` can't call itself, so it's declared
+with `var` first. BASIC, COBOL, and Fortran skip recursion and step from
+one split to the next in dictionary order, and bwBASIC adds a trap of its
+own: it runs a `FOR` loop's body once even when the loop should run zero
+times.
+
+Finally, watch the division that prints the means. Lua's and Elixir's `/`
+always give a float. Tcl's rounds two integers down, giving 403, so it
+converts with `double()` first, and Common Lisp's gives the exact fraction
+3231/8, so it divides by a double instead.
